@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneGold EU Digital Media Strategy</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+const { useState } = React;
+
+const NAVY = "#0F2B3C";
+const NAVY_LIGHT = "#1A3D52";
+const NAVY_MID = "#245068";
+const GOLD = "#C8972E";
+const GOLD_LIGHT = "#DABB6A";
+const GOLD_BG = "rgba(200,151,46,0.08)";
+const SKY = "#4A9FD9";
+const SKY_BG = "rgba(74,159,217,0.08)";
+const SKY_LIGHT = "#E8F3FC";
+const WHITE = "#FFFFFF";
+const OFFWHITE = "#F6F8FA";
+const LIGHT = "#EEF1F5";
+const BORDER = "#D8DDE5";
+const BORDER_L = "#E8ECF1";
+const TEXT = "#1A2B3C";
+const TEXT2 = "#4A5B6C";
+const TEXT3 = "#7A8A9A";
+const GREEN = "#1B9E5E";
+const GREEN_BG = "rgba(27,158,94,0.08)";
+const RED = "#D44040";
+const RED_BG = "rgba(212,64,64,0.08)";
+const ORANGE = "#D48A20";
+const ORANGE_BG = "rgba(212,138,32,0.08)";
+
+const markets = [
+  { id:"de", name:"Germany", flag:"🇩🇪", budget:35, competitor:"FlexGold", wedge:"Cost — 0.8% vs 2% premium", visits:"11.4K", cpi:"$0.52", cta:"Jetzt Schweizer Gold sichern" },
+  { id:"uk", name:"United Kingdom", flag:"🇬🇧", budget:25, competitor:"BullionVault", wedge:"Simplicity — No order board", visits:"302K", cpi:"$0.77", cta:"Start with Swiss Gold at Spot Price" },
+  { id:"it", name:"Italy", flag:"🇮🇹", budget:25, competitor:"None (First Mover)", wedge:"Education — Zero competition", visits:"~0", cpi:"$0.04", cta:"Investi in oro svizzero fisico" },
+  { id:"fr", name:"France", flag:"🇫🇷", budget:15, competitor:"VeraCash", wedge:"Trust — MKS PAMP > AuCOFFRE", visits:"105K", cpi:"$0.42", cta:"Achetez votre or physique suisse" },
+];
+
+const marketSEO = {
+  de: {
+    insight: "BullionVault has a 75% German bounce rate despite ~194K visits/4mo — terrible content-market fit. FlexGold dominates with native DE content but has no SEO-visible price pages. Wide open.",
+    keywords: [
+      { kw:"Goldpreis / Goldpreis aktuell", vol:"110K+", diff:"High", gap:"BV weak DE content", pri:"CRITICAL", content:"Price chart /de/goldpreis" },
+      { kw:"Silberpreis / Silberpreis aktuell", vol:"40K+", diff:"Med", gap:"BV weak DE content", pri:"CRITICAL", content:"Price chart /de/silberpreis" },
+      { kw:"Gold kaufen online", vol:"12K+", diff:"Med", gap:"FlexGold only", pri:"HIGH", content:"Landing page /de/gold-kaufen" },
+      { kw:"Goldbarren kaufen", vol:"8K+", diff:"Med", gap:"Physical dealers only", pri:"HIGH", content:"Product page + comparison" },
+      { kw:"Gold Sparplan", vol:"5K+", diff:"Low", gap:"FlexGold only (at 2x cost)", pri:"HIGH", content:"Sparplan landing page" },
+      { kw:"Goldpreis Prognose 2026", vol:"4K+", diff:"Med", gap:"News sites only", pri:"MEDIUM", content:"Blog / market analysis" },
+      { kw:"Gold als Geldanlage", vol:"3K+", diff:"Low", gap:"Blog content only", pri:"MEDIUM", content:"Investment guide" },
+      { kw:"Gold vs ETF Vergleich", vol:"1K+", diff:"Low", gap:"No competitor claims", pri:"MEDIUM", content:"Comparison tool /de/vergleich" },
+      { kw:"Schweizer Gold kaufen", vol:"800+", diff:"Low", gap:"FlexGold partial", pri:"HIGH", content:"Swiss vault landing page" },
+    ],
+    funnel: [
+      { stage:"Awareness", keywords:"Goldpreis, Silberpreis, Gold Prognose", content:"Live price chart pages", status:"DE + IT are open — BV dominates EN, VeraCash owns FR" },
+      { stage:"Consideration", keywords:"Gold kaufen, Gold Sparplan, Gold vs ETF", content:"Comparison tools, Sparplan page, guides", status:"Fragmented. No competitor owns cross-language comparisons." },
+      { stage:"Decision", keywords:"FlexGold Alternative, Gold Sparplan Vergleich", content:"Head-to-head comparison, fee calculator", status:"ZERO competitors own these terms. Massive gap." },
+    ]
+  },
+  uk: {
+    insight: "BullionVault holds position 1-3 for every major EN price query. Volume is massive (2.1M+ for 'gold price') but difficulty is high. The play is featured tables via schema markup and capturing decision-stage comparison terms that BV ignores entirely.",
+    keywords: [
+      { kw:"gold price", vol:"2.12M", diff:"High (80)", gap:"BV position 1", pri:"HIGH", content:"Price chart /gold-price" },
+      { kw:"silver price", vol:"1.89M", diff:"Med (48)", gap:"BV position 1", pri:"HIGH", content:"Price chart /silver-price" },
+      { kw:"gold price today", vol:"1.09M", diff:"High (70)", gap:"BV position 2", pri:"HIGH", content:"Price chart /gold-price" },
+      { kw:"silver price today", vol:"1.22M", diff:"Med (55)", gap:"BV via news articles", pri:"HIGH", content:"Price chart /silver-price" },
+      { kw:"gold price chart", vol:"108K", diff:"High (84)", gap:"BV position 3", pri:"MEDIUM", content:"Price chart with schema" },
+      { kw:"buy gold online UK", vol:"8K+", diff:"Med", gap:"Zero PM competitors bidding", pri:"HIGH", content:"Landing page /buy-gold" },
+      { kw:"BullionVault alternative", vol:"1K+", diff:"Low", gap:"ZERO competitors", pri:"HIGH", content:"Comparison page /compare" },
+      { kw:"cheapest gold storage", vol:"500+", diff:"Low", gap:"ZERO competitors", pri:"HIGH", content:"Fee calculator tool" },
+    ],
+    funnel: [
+      { stage:"Awareness", keywords:"gold price, silver price, gold price today", content:"Live price chart pages with schema", status:"BV dominates. Target featured tables + AI Overviews." },
+      { stage:"Consideration", keywords:"buy gold online, gold storage fees, gold vs ETF", content:"Comparison tools, educational guides", status:"Fragmented. No cross-platform comparison content." },
+      { stage:"Decision", keywords:"BullionVault vs, BullionVault alternative, cheapest gold storage", content:"Head-to-head comparison, fee calculator", status:"ZERO competitors own these. Rank within weeks." },
+    ]
+  },
+  it: {
+    insight: "Widest-open market with a structural SEO advantage. The /it subdirectory inherits onegold.com's existing domain authority. ZERO competitors have Italian-language precious metals content. Every keyword listed has no digital PM competitor.",
+    keywords: [
+      { kw:"prezzo oro / quotazione oro", vol:"30K+", diff:"Med", gap:"No digital PM competitor", pri:"CRITICAL", content:"Price chart /it/prezzo-oro" },
+      { kw:"prezzo argento", vol:"10K+", diff:"Med", gap:"No digital PM competitor", pri:"CRITICAL", content:"Price chart /it/prezzo-argento" },
+      { kw:"investire in oro", vol:"5K+", diff:"Med", gap:"Finance blogs only", pri:"HIGH", content:"Investment guide" },
+      { kw:"comprare oro fisico", vol:"4K+", diff:"Low", gap:"Physical dealers only", pri:"HIGH", content:"Landing page /it/comprare-oro" },
+      { kw:"lingotto d'oro prezzo", vol:"3K+", diff:"Low", gap:"Physical dealers only", pri:"MEDIUM", content:"Price/product page" },
+      { kw:"come comprare oro online", vol:"2K+", diff:"Low", gap:"Minimal competition", pri:"HIGH", content:"How-to guide" },
+      { kw:"oro vs ETF confronto", vol:"800+", diff:"Low", gap:"No competitor claims", pri:"HIGH", content:"Comparison content" },
+      { kw:"oro fisico custodia", vol:"500+", diff:"Low", gap:"Zero competition", pri:"MEDIUM", content:"Swiss vault trust page" },
+    ],
+    funnel: [
+      { stage:"Awareness", keywords:"prezzo oro, quotazione oro, prezzo argento", content:"Live price chart pages (IT)", status:"ZERO competitors. First-mover advantage + DA inheritance." },
+      { stage:"Consideration", keywords:"investire in oro, comprare oro fisico, oro vs ETF", content:"Investment guide, comparison content", status:"Finance blogs only. No PM-specific content exists." },
+      { stage:"Decision", keywords:"come comprare oro online, oro fisico custodia", content:"How-to guide, Swiss vault trust page", status:"Completely uncontested. Define the category." },
+    ]
+  },
+  fr: {
+    insight: "VeraCash proves a single well-optimized French price page can drive 75%+ of total site traffic. Their /fr/cours-or ranks #2 for 'cours de l'or' (estimated 40-60K/mo actual French volume). Beatable with MKS PAMP trust signals and better page speed.",
+    keywords: [
+      { kw:"cours de l'or / prix de l'or", vol:"50K+", diff:"Med", gap:"VeraCash #2", pri:"CRITICAL", content:"Price chart /fr/cours-or" },
+      { kw:"cours de l'argent", vol:"15K+", diff:"Med", gap:"VeraCash owns", pri:"CRITICAL", content:"Price chart /fr/cours-argent" },
+      { kw:"acheter or physique", vol:"8K+", diff:"Med", gap:"VeraCash soft CTAs", pri:"HIGH", content:"Landing page /fr/acheter-or" },
+      { kw:"investir dans l'or", vol:"6K+", diff:"Med", gap:"Blog content only", pri:"HIGH", content:"Investment guide" },
+      { kw:"pourquoi l'or baisse", vol:"4K+", diff:"Low", gap:"VeraCash ranks", pri:"MEDIUM", content:"Market explainer blog" },
+      { kw:"lingot d'or prix", vol:"3K+", diff:"Med", gap:"Physical dealers only", pri:"MEDIUM", content:"Price/product page" },
+      { kw:"or physique stockage suisse", vol:"1.5K+", diff:"Low", gap:"VeraCash partial", pri:"HIGH", content:"Swiss vault trust page" },
+      { kw:"épargne or physique", vol:"1.5K+", diff:"Low", gap:"VeraCash owns concept", pri:"HIGH", content:"Savings-focused landing" },
+      { kw:"patrimoine or protection", vol:"1K+", diff:"Low", gap:"VeraCash cultural", pri:"MEDIUM", content:"Heritage-themed guide" },
+    ],
+    funnel: [
+      { stage:"Awareness", keywords:"cours de l'or, prix de l'or, cours de l'argent", content:"Live price chart pages (FR)", status:"VeraCash #2. Beat with MKS PAMP trust + better Core Web Vitals." },
+      { stage:"Consideration", keywords:"acheter or physique, investir dans l'or, épargne or", content:"Investment guide, savings landing page", status:"VeraCash uses soft CTAs. OneGold can be more direct." },
+      { stage:"Decision", keywords:"VeraCash alternative, or stockage suisse", content:"Comparison page, Swiss vault trust page", status:"ZERO competitors own 'VeraCash alternative' queries." },
+    ]
+  },
+};
+
+const compMatrix = {
+  cols:["OneGold","BullionVault","FlexGold","VeraCash","Kinesis","Glint","TallyMoney","GoldMoney","DigiGold","Revolut/TR/Bitpanda"],
+  highlight: 0,
+  rows:[
+    { label:"Gold Premium", vals:["0.8%","0.5%","2%","3%","0.22%","0.9%","1.49%","0.5%","0.5%","0.5–2%"], ogWin:[false,false,true,true,false,true,true,false,false,true] },
+    { label:"Gold Storage Fee", vals:["0.12%","0.12%","1.2%","0%","0%","0.24%","0.5%","0.18%","0.5%","0%"], ogWin:[false,false,true,false,false,true,true,true,true,false] },
+    { label:"Min Annual Storage", vals:["$20","$48","$0","$0","$0","$12","£36","$120","$0","$0"], ogWin:[false,true,false,false,false,false,true,true,false,false] },
+    { label:"Vaults", vals:["CH,UK,US,CA","CH,UK,SG","CH","CH","15 vaults","CH","CH","10 vaults","UK","Not named"], ogWin:[true,false,false,false,false,false,false,false,false,false] },
+    { label:"Payment Methods", vals:["Wire only ⚠️","Wire","Wire","Wire, Cards","Wire, Cards, Apple/Google Pay","Wire, Debit (3%)","Wire","Wire, Revolut, Wise","Wire, Cards, GPay","Wire, Cards, Apple/GPay, PayPal"], ogGap:true },
+    { label:"Mobile App", vals:["✅","✅","✅","✅","✅","✅","✅","✅","❌","✅"] },
+    { label:"Financial Card", vals:["❌ ⚠️","❌","❌","✅","✅","✅","✅","✅","❌","✅"], ogGap:true },
+    { label:"Repeat Buy / AutoInvest", vals:["✅","✅","✅","❌","✅","✅","❌","✅","✅","✅"], ogWin:[true,false,false,true,false,false,true,false,false,false] },
+    { label:"Physical Redemption", vals:["✅","100g bars only","✅","❌","100g bars min","Limited/costly","❌","10g or 1000g","❌","❌"], ogWin:[true,false,false,true,false,true,true,false,true,true] },
+    { label:"Limit Orders", vals:["✅","✅","✅","❌","✅","✅","❌","✅","❌","✅"], ogWin:[false,false,false,true,false,false,true,false,true,false] },
+    { label:"Languages", vals:["EN,DE,FR,IT","EN,DE,FR,IT,ES +3","DE,EN","EN,FR","EN","EN","EN","EN","EN","Most EU"], ogWin:[false,false,true,true,true,true,true,true,true,false] },
+    { label:"Promotional Offer", vals:["Gold at Spot","4g free silver","None","None","½oz silver","None","None","None","None","Cashback"] },
+    { label:"EU Branded Searches/mo", vals:["~400","74,000","N/A","9,900","1,300","12,100","590","2,400","720","N/A"], ogGap:true },
+  ]
+};
+
+const marketCTA = {
+  uk: {
+    competitor: { name:"BullionVault", visits:"302K/mo", branded:"74K/mo", bounce:"69%", pages:"2.4", scores:{ copy:7, trust:10, friction:8, mobile:5, incentive:9, local:9, overall:8 },
+      strengths:"Extraordinary social proof ($10B AUM, 125K+ users, Queen's Awards, LBMA, daily audit). Free 4g silver trial eliminates first-purchase anxiety. Price chart pages drive 70%+ organic.",
+      weaknesses:"Dated 2012-era design. Exchange-style order board intimidates beginners (69% bounce). Desktop-first. Zero urgency, lifestyle messaging, or emotional framing."
+    },
+    ctas:[
+      { label:"Trust-First Hero", button:"Start with Swiss Gold at Spot Price", sub:"Backed by MKS PAMP. Vaulted in Switzerland. Yours in minutes.", placement:"Above fold, every landing page", timing:"Week 1", impact:"High" },
+      { label:"Incentivized Trial", button:"Open Your Free Vault", sub:"No minimum. No obligation. See live gold prices in 60 seconds.", placement:"Mid-page after How It Works", timing:"Week 3–4", impact:"High" },
+      { label:"Comparison Anchor", button:"Compare Our Fees", sub:"See how 0.8% premium compares to BullionVault, Glint, and ETFs.", placement:"Sticky sidebar on content pages + /compare/ page", timing:"Month 2–3", impact:"Very High" },
+      { label:"Retention Loop", button:"Set Up AutoInvest", sub:"Build your gold position automatically. Choose amount & schedule.", placement:"Post-purchase + email Day 3 + dashboard", timing:"Month 2–3", impact:"High (LTV)" },
+    ],
+    tests:[
+      { test:"'Start with Swiss Gold at Spot Price' vs 'Buy Gold'", metric:"Account creation rate", traffic:"Paid + organic" },
+      { test:"Comparison tool vs static pricing page", metric:"Account creation rate", traffic:"Organic" },
+    ],
+    wedgeInsight:"BullionVault's complexity is the wedge. Their order board, dense text, and desktop-first design drive a 69% bounce rate. 'No Order Board Required' is the killer headline. Pair simplicity with MKS PAMP trust signals to prevent downmarket perception."
+  },
+  de: {
+    competitor: { name:"FlexGold", visits:"11.4K/mo", branded:"N/A (emerging)", bounce:"45%", pages:"6.6", scores:{ copy:6, trust:8, friction:7, mobile:7, incentive:3, local:8, overall:7 },
+      strengths:"Hidden DACH powerhouse. SOLIT Group heritage, FOCUS MONEY awards. Native German Sparplan messaging. 6.6 pages/visit = deepest engagement. Swiss-based, FINMA, quarterly RSM audits.",
+      weaknesses:"2% gold premium (2.5x OneGold). 1.2% annual storage (10x OneGold for modest portfolios). Zero presence outside DACH. No free trial or incentive. App-first with no web purchase path."
+    },
+    ctas:[
+      { label:"Localized Hero", button:"Jetzt Schweizer Gold sichern", sub:"Ab 0,8% Aufschlag. In Schweizer Tresoren verwahrt.", placement:"Geo-targeted hero for DE visitors", timing:"Week 1–2", impact:"Very High" },
+      { label:"Sparplan CTA", button:"Gold Sparplan starten", sub:"Automatisch Gold kaufen ab 0,8%. Verwahrt von MKS PAMP in Zürich.", placement:"Dedicated /de/gold-sparplan page", timing:"Month 2–3", impact:"Very High" },
+      { label:"Cost Comparison", button:"Gebühren vergleichen", sub:"Sehen Sie, wie 0,8% Aufschlag im Vergleich zu FlexGold, BullionVault und ETFs abschneidet.", placement:"/de/vergleich page + sidebar", timing:"Month 2–3", impact:"Very High" },
+      { label:"Retention Loop", button:"AutoInvest einrichten", sub:"Ihren Gold Sparplan starten. Betrag und Intervall wählen.", placement:"Post-purchase + email Day 3", timing:"Month 2–3", impact:"High (LTV)" },
+    ],
+    tests:[
+      { test:"DE localized CTA vs English CTA for German visitors", metric:"Account creation rate", traffic:"Paid + organic" },
+      { test:"Sparplan landing page vs generic gold-kaufen page", metric:"Account creation rate", traffic:"Organic DE" },
+    ],
+    wedgeInsight:"FlexGold's cost is the wedge. Their 2% gold premium is 2.5x OneGold's 0.8%, and their 1.2% annual storage is 10x OneGold's rate for modest portfolios. A transparent German-language fee comparison — framed as 'Gold Sparplan zum halben Preis' — is the single most powerful conversion weapon in DACH."
+  },
+  fr: {
+    competitor: { name:"VeraCash", visits:"105K/mo", branded:"9.9K/mo", bounce:"54%", pages:"2.7", scores:{ copy:5, trust:7, friction:7, mobile:6, incentive:4, local:9, overall:7 },
+      strengths:"Best-in-class French localization — 75%+ traffic from France alone (361K from FR). 'Patrimoine' and 'transmettre' messaging resonates with French cultural gold tradition. 4.5 Trustpilot. Free Mastercard. 3t gold + 31t silver held.",
+      weaknesses:"CTAs too soft — 'Explore' and 'Discover' are awareness verbs for consideration-stage visitors. No urgency, incentive, or trial. Limited to EN/FR. Zero storage fee strong but buried in copy."
+    },
+    ctas:[
+      { label:"Localized Hero", button:"Achetez votre or physique suisse", sub:"Stockage en coffre suisse. Assurance Lloyd's incluse.", placement:"Geo-targeted hero for FR visitors", timing:"Week 1–2", impact:"Very High" },
+      { label:"Patrimoine CTA", button:"Protégez votre patrimoine", sub:"Or physique suisse garanti par MKS PAMP. Dès 0,8% de prime.", placement:"/fr/patrimoine-or landing page", timing:"Month 2–3", impact:"High" },
+      { label:"Trust Anchor", button:"Comparer nos frais", sub:"Voyez comment 0,8% se compare à VeraCash, BullionVault et les ETF.", placement:"/fr/comparer page + sidebar", timing:"Month 2–3", impact:"Very High" },
+      { label:"Savings CTA", button:"Programmez votre épargne or", sub:"Achat automatique d'or. Choisissez le montant et la fréquence.", placement:"Post-purchase + email Day 3", timing:"Month 2–3", impact:"High (LTV)" },
+    ],
+    tests:[
+      { test:"FR patrimoine CTA vs translated EN CTA for French visitors", metric:"Account creation rate", traffic:"Paid + organic" },
+      { test:"'MKS PAMP' trust anchor vs generic 'Swiss vaults' messaging", metric:"Click-through rate", traffic:"Meta FR" },
+    ],
+    wedgeInsight:"VeraCash's trust gap is the wedge. They dominate French cultural messaging but their AuCOFFRE parentage cannot match MKS PAMP (world's largest LBMA refiner) + Lloyd's insurance. Out-trust them, don't try to out-cultural them. Use 'patrimoine' vocabulary but layer institutional-grade credentials on top."
+  },
+  it: {
+    competitor: { name:"None (First Mover)", visits:"~0", branded:"N/A", bounce:"N/A", pages:"N/A", scores:null,
+      strengths:"No digital PM competitor has Italian-language content. BullionVault technically supports IT but has minimal organic visibility. The Italian retail investment market is growing rapidly.",
+      weaknesses:"N/A — no incumbent to assess. OneGold defines the CTA playbook for this market."
+    },
+    ctas:[
+      { label:"Localized Hero", button:"Investi in oro svizzero fisico", sub:"Custodito in caveau svizzeri. Assicurato da Lloyd's.", placement:"Geo-targeted hero for IT visitors", timing:"Week 1–2", impact:"Very High" },
+      { label:"Educational Entry", button:"Scopri come investire in oro", sub:"Guida completa all'investimento in oro fisico. Semplice e sicuro.", placement:"/it/guida-investire-oro page", timing:"Month 2–3", impact:"Very High" },
+      { label:"Cost Transparency", button:"Confronta i costi", sub:"Vedi come lo 0,8% di premio si confronta con ETF e banche.", placement:"/it/confronto page", timing:"Month 2–3", impact:"High" },
+      { label:"Retention Loop", button:"Imposta l'acquisto automatico", sub:"Accumula oro automaticamente. Scegli importo e frequenza.", placement:"Post-purchase + email Day 3", timing:"Month 2–3", impact:"High (LTV)" },
+    ],
+    tests:[
+      { test:"Italian-language CTA vs English for Italian IP visitors", metric:"Account creation rate", traffic:"Paid IT" },
+      { test:"Educational guide entry vs direct purchase CTA", metric:"Account creation rate", traffic:"Organic IT" },
+    ],
+    wedgeInsight:"Italy is a blank canvas — no competitor to wedge against. The play is education + accessibility. Lead with 'come investire in oro' (how to invest in gold) and position OneGold as the category-defining platform. The /it subdirectory inherits onegold.com's domain authority, giving a structural SEO advantage. Aspirational, educational tone — you're building the market, not taking share."
+  },
+};
+
+const phases = [
+  { id:30, label:"Days 1–30", title:"Fix the Funnel", subtitle:"Repair app UX, fix tracking, launch video — then activate paid channels", color:RED, budget:"$45,000/mo",
+    tracks:[
+      { name:"App & Product Fixes", icon:"🔧", desc:"Highest priority — EU converts at 1-2% vs US at 8-11%. No paid spend matters until this is fixed.", tasks:[
+        { task:"Fix €100 minimum popup bug — blocks users 2x before they can enter a valid amount", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Launch credit card payment option — wire-only kills conversion for sub-€1K AOV; CC = 30-40% of new customer payments at Gold Avenue", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Fix payment confirmation email — currently looks like a scam (mismatched images, GB IBAN, US 800-number, broken mobile formatting)", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Fix checkout compliance opt-in — French app redirects to English US CGV/cancellation policy and US privacy clauses", priority:"CRITICAL", markets:["fr","de","it"], source:"Marc Email" },
+        { task:"Display transparent pricing in basket — user enters €150, shown €147.40 with '0 fees' but no explanation of the €2.60 gap", priority:"HIGH", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Simplify vault selection for new users — choosing between 4 vaults on first open is too complex for beginners; explore defaulting to 1-2 vaults (UK + CH)", priority:"HIGH", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Add local-currency IBAN for wire payments — GB IBAN is not reassuring for DE/FR/IT customers", priority:"HIGH", markets:["de","fr","it"], source:"Marc Email" },
+        { task:"Fix FAQ cancellation language — 'reserves the right to charge' is not mandatory and erodes trust", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Marc Email" },
+      ]},
+      { name:"Tracking & Attribution", icon:"📊", desc:"Unbounce → App Store redirect breaks attribution. Campaigns are flying blind.", tasks:[
+        { task:"Implement deep linking / MMP integration to preserve attribution through app store redirect", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Implement cross-domain server-side GTM across all EU properties (moved up from Day 61-90)", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Sec 6.2 + Marc" },
+        { task:"Create new 'first_buy_confirmed' event for improved performance tracking and audience targeting", priority:"HIGH", markets:["uk","de","fr","it"], source:"Marin Report" },
+        { task:"Revert campaign optimization event back to 'sign up' from 'begin checkout' to unlock algorithm learning", priority:"HIGH", markets:["uk","de","fr","it"], source:"Marc Email" },
+      ]},
+      { name:"Video & Creative", icon:"🎬", desc:"No video assets. Running gif-style static creatives. PMax and Meta require video for storytelling.", tasks:[
+        { task:"Produce 2-3 ten-second motion graphics videos using existing scripts (Own Real Gold, Simple & Easy, Secure & Trustworthy)", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Launch new ad headlines incorporating trust signals: MKS PAMP, 0.8% premium, Swiss vaulting, Lloyd's insurance", priority:"HIGH", markets:["uk","de","fr","it"], source:"ESK + Marc" },
+        { task:"Re-enable Performance Max campaigns to leverage video + web landing page storytelling", priority:"HIGH", markets:["uk","de","fr","it"], source:"Marc Email" },
+      ]},
+      { name:"Paid Media", icon:"📡", desc:"Consolidate campaigns — fewer, better-funded. $200-240/day across 8 campaigns is too thin for algorithm learning.", tasks:[
+        { task:"Consolidate to fewer campaigns with higher per-campaign budgets to unlock algorithm optimization", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Launch Google Ads brand defense across all 4 EU markets", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 7.1" },
+        { task:"Launch competitor conquest — BullionVault (UK), FlexGold (DE), VeraCash (FR)", priority:"HIGH", markets:["uk","de","fr"], source:"Sec 1.1B" },
+        { task:"Fix 4 disapproved French Generic ads — replace English copy with FR patrimoine messaging", priority:"HIGH", markets:["fr"], source:"ESK Analysis" },
+        { task:"Launch Italy Generic — 'comprare oro fisico' (9K+ searches, €0.40 CPC, zero competitors)", priority:"HIGH", markets:["it"], source:"ESK Gap" },
+      ]},
+      { name:"CRO & Trust", icon:"🎯", desc:"Trust-first hero CTAs + MKS PAMP badges. Deploy on landing pages while app fixes are in progress.", tasks:[
+        { task:"Deploy Trust-First Hero CTA above fold on every EU landing page with MKS PAMP badges", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Rec 1" },
+        { task:"Deploy localized CTA variants — geo-targeted hero per market", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Rec 3" },
+        { task:"Replace 'APMEX + Sprott' with 'MKS PAMP' as lead credential on all EU pages", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Gap Analysis" },
+        { task:"Deploy price alert email signup on landing pages — low-friction lead gen while app funnel is being fixed", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 4.1" },
+      ]},
+    ]},
+  { id:60, label:"Days 31–60", title:"Scale & Test", subtitle:"App funnel validated — now launch SEO foundation, A/B testing, email sequences", color:SKY, budget:"$45–56.5K/mo",
+    tracks:[
+      { name:"SEO & Content", icon:"🔍", desc:"Price chart pages are the #1 organic growth lever — now that the funnel can convert, build the top.", tasks:[
+        { task:"Build & deploy gold/silver price chart pages on all 4 EU domains (highest-impact SEO action)", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Sec 2.1" },
+        { task:"Implement hreflang tags across all EU domains — prevent cannibalization", priority:"CRITICAL", markets:["uk","de","fr","it"], source:"Sec 3" },
+        { task:"Deploy FinancialProduct + PriceSpecification schema on every price page", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 3" },
+        { task:"Publish 5 initial blog posts per EU domain", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 2.4" },
+        { task:"Build interactive fee comparison calculator — all 4 EU domains", priority:"HIGH", markets:["uk","de","fr","it"], source:"Rec 4" },
+      ]},
+      { name:"Paid Media", icon:"📡", tasks:[
+        { task:"Deploy Meta Fintech Gold Upgrader campaigns (Revolut/Trade Republic/Bitpanda targeting)", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 1.2" },
+        { task:"Launch UK Generic search — 'buy gold online' (8K+/mo, $1.50–3.00 CPC)", priority:"HIGH", markets:["uk"], source:"ESK Gap" },
+        { task:"Build retargeting pools: Price Chart Visitors (7d), Compare (14d), Signup Abandoners (30d)", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 1.3" },
+        { task:"Deploy programmatic display: FT, Finanzen.net, Les Echos, Il Sole 24 Ore", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Sec 1.3" },
+        { task:"Add 2–5 creative variants per APP ad group (currently 1 ad each across $51K spend)", priority:"HIGH", markets:["uk","de","fr","it"], source:"ESK Analysis" },
+      ]},
+      { name:"CRO & Trust", icon:"🎯", tasks:[
+        { task:"Deploy 'Open Your Free Vault' CTA mid-page after How It Works", priority:"HIGH", markets:["uk","de","fr","it"], source:"Rec 2" },
+        { task:"A/B Test 1: 'Start with Swiss Gold at Spot Price' vs 'Buy Gold'", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 3.3" },
+        { task:"A/B Test 2: DE localized CTA vs English for German visitors", priority:"HIGH", markets:["de"], source:"Sec 3.3" },
+        { task:"Deploy sticky comparison sidebar on content pages", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Rec 4" },
+      ]},
+      { name:"Email & Lifecycle", icon:"📧", tasks:[
+        { task:"Launch 7-email onboarding in all 4 languages (14-day drip)", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 4.2" },
+        { task:"Deploy post-purchase AutoInvest prompt (Day 3 email + dashboard)", priority:"HIGH", markets:["uk","de","fr","it"], source:"Rec 5" },
+        { task:"Build daily price summary email (8am local) for price alert subscribers", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Sec 4.1" },
+      ]},
+    ]},
+  { id:90, label:"Days 61–90", title:"Accelerate", subtitle:"Scale winning campaigns, launch authority content, begin CMS migration", color:GREEN, budget:"$56.5K/mo →",
+    tracks:[
+      { name:"SEO & Content", icon:"🔍", tasks:[
+        { task:"Launch Gold Sparplan page on onegold.de — undercut FlexGold 2% with 0.8%", priority:"HIGH", markets:["de"], source:"Sec 2.2" },
+        { task:"Build Revolut Gold vs OneGold comparison pages in 4 languages", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 2.2" },
+        { task:"Launch /compare/ as competitor conquest Google Ads landing page", priority:"HIGH", markets:["uk","de","fr","it"], source:"Rec 4" },
+        { task:"Launch French patrimoine/heritage guide on onegold.fr", priority:"HIGH", markets:["fr"], source:"Sec 2.2" },
+        { task:"Launch Italian investment guide — first-mover, zero competition", priority:"HIGH", markets:["it"], source:"Sec 2.2" },
+        { task:"Monthly market analysis blog in 4 languages", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Sec 2.4" },
+      ]},
+      { name:"Paid Media", icon:"📡", tasks:[
+        { task:"Scale paid to $40K/mo — concentrate on winning markets from Phase 1-2 data", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 7.2" },
+        { task:"Launch 'Is Your Gold Real?' Revolut wedge campaign — carousel + video", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 5.2" },
+        { task:"Shift budget toward retargeting (lower CAC) as audiences grow", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Sec 7.3" },
+      ]},
+      { name:"CRO & Trust", icon:"🎯", tasks:[
+        { task:"A/B Test 3: 'Open Your Free Vault' vs 'Create Free Account'", priority:"HIGH", markets:["uk","de","fr","it"], source:"Sec 3.3" },
+        { task:"A/B Test 4: Comparison calculator vs static pricing page", priority:"MEDIUM", markets:["uk","de","fr","it"], source:"Sec 3.3" },
+        { task:"Deploy AutoInvest retention CTA + 'Gold Sparplan' in DE", priority:"HIGH", markets:["de","uk","fr","it"], source:"Rec 5" },
+      ]},
+      { name:"Infrastructure", icon:"⚙️", tasks:[
+        { task:"Begin CMS migration: Unbounce → WordPress + WPML via reverse proxy (urgent — app-only + Unbounce confirmed as organic/tracking blocker)", priority:"HIGH", markets:["uk","de","fr","it"], source:"Domain Strategy + Marc" },
+        { task:"Evaluate adding Apple Pay / Google Pay as payment methods", priority:"HIGH", markets:["uk","de","fr","it"], source:"Marc Email" },
+        { task:"Evaluate Italian subdirectory SEO — inform Spain expansion decision", priority:"MEDIUM", markets:["it"], source:"Sec 3" },
+      ]},
+    ]},
+];
+
+const kpis = [
+  { label:"EU Monthly Visits", current:"2,600", d30:"5,000", d60:"8,000", d90:"12,000", m6:"15,000", m12:"50,000" },
+  { label:"Account Creations/mo", current:"~1,000", d30:"1,200", d60:"1,500", d90:"2,000", m6:"3,000", m12:"5,000" },
+  { label:"Checkout Rate (EU)", current:"~3%", d30:"5%", d60:"7%", d90:"8%", m6:"9%", m12:"11%", isNew:true },
+  { label:"Placed → Paid Rate", current:"TBD", d30:"50%", d60:"60%", d90:"70%", m6:"80%", m12:"85%", isNew:true },
+  { label:"First Purchases/mo", current:"~15", d30:"30", d60:"65", d90:"110", m6:"215", m12:"750" },
+  { label:"Organic Keywords (Top 20)", current:"0", d30:"0", d60:"10", d90:"15", m6:"25", m12:"100" },
+  { label:"Email List (EU)", current:"~0", d30:"500", d60:"1,500", d90:"3,000", m6:"5,000", m12:"20,000" },
+  { label:"Blended CAC (paid only)", current:"~$250+", d30:"$150", d60:"$100", d90:"$80", m6:"$65", m12:"$45" },
+];
+
+const budgetData = [
+  { cat:"Paid Search (Google)", p1:12500, p2:18000, p3:20000, c:GOLD },
+  { cat:"Paid Social (Meta)", p1:10000, p2:15000, p3:20000, c:SKY },
+  { cat:"Programmatic/Display", p1:2500, p2:5000, p3:10000, c:GREEN },
+  { cat:"Content Production", p1:15000, p2:12000, p3:10000, c:"#D4874A" },
+  { cat:"CRO & Testing", p1:2000, p2:2000, p3:2000, c:"#8B6DAF" },
+  { cat:"Email Platform", p1:1000, p2:1500, p3:2000, c:"#3BA7A0" },
+  { cat:"Social Management", p1:2000, p2:3000, p3:4000, c:"#C46B6B" },
+];
+
+const strategicPillars = [
+  { icon:"🔧", title:"Fix the Funnel First", desc:"EU converts at 1-2% vs US at 8-11%. Wire-only payment, broken UX, and lost tracking mean every top-of-funnel dollar leaks. App fixes are the #1 priority.", metric:"5-6x conversion gap between US and EU", isNew:true },
+  { icon:"📊", title:"Price Charts as Growth Engine", desc:"BullionVault's price pages drive 70%+ of organic traffic. OneGold has zero equivalent pages on any EU domain.", metric:"70%+ of competitor organic clicks from price pages" },
+  { icon:"🔀", title:"Two Conversion Wedges", desc:"Wedge A: cost transparency (0.8% vs 2%). Wedge B: ownership-gap targeting 29.6M fintech users.", metric:"29.6M combined fintech visits across 4 markets" },
+  { icon:"🌍", title:"Localization as Competitive Moat", desc:"4-language capability matched only by BullionVault. VeraCash proves: French-only drives 361K visits.", metric:"4 languages — only BV matches this breadth" },
+];
+
+const competitorGaps = [
+  { el:"MKS PAMP", strat:"Lead trust signal in ALL markets", cur:"Not in any ad", sev:"critical" },
+  { el:"Lloyd's Insurance", strat:"Above-the-fold all markets", cur:"Not in any ad", sev:"critical" },
+  { el:"0.8% Premium", strat:"Quantify in every CTA", cur:"Generic 'low fees' only", sev:"critical" },
+  { el:"Swiss Vaulting", strat:"Specify 'Swiss' in every market", cur:"Indirect in 1 ad", sev:"high" },
+  { el:"Anti-BullionVault (UK)", strat:"'No Order Board Required'", cur:"'Switch & Save' $10 CPI", sev:"high" },
+  { el:"Anti-FlexGold (DE)", strat:"'Gold Sparplan ab 0,8%'", cur:"No positioning", sev:"high" },
+  { el:"Patrimoine (FR)", strat:"Heritage framing for France", cur:"English copy in FR ads", sev:"critical" },
+  { el:"Price Chart Pages", strat:"Top-of-funnel entry point", cur:"Zero on any EU domain", sev:"critical" },
+];
+
+const funnelIssues = [
+  { el:"Credit card payments", status:"Not available — wire only", impact:"Kills conversion for sub-€1K AOV. CC = 30-40% of new customer payments.", sev:"critical", fix:"Launch CC payments immediately" },
+  { el:"€100 minimum popup bug", status:"Blocks users 2x on entry", impact:"Users can't enter amount without being blocked twice by popup.", sev:"critical", fix:"Fix popup validation logic" },
+  { el:"Payment confirmation email", status:"Looks like a scam", impact:"Mismatched images, GB IBAN, US 800-number, broken on mobile.", sev:"critical", fix:"Redesign email with local branding" },
+  { el:"Compliance checkout redirect", status:"FR app → US English legal", impact:"French users see US CGV and US privacy clauses at checkout.", sev:"critical", fix:"Localize legal links per market" },
+  { el:"4-vault selection", status:"Shown on first open", impact:"Too complex for PM beginners. Confusion kills first-time conversion.", sev:"high", fix:"Default to 1-2 vaults for new users" },
+  { el:"Basket price display", status:"€150 input → €147.40 shown", impact:"'0 fees' shown but €2.60 missing. Zero transparency = zero trust.", sev:"high", fix:"Clear breakdown of all charges" },
+  { el:"GB IBAN for wire payments", status:"All markets use GB IBAN", impact:"Not reassuring for DE/FR/IT customers.", sev:"high", fix:"Add local-currency IBAN options" },
+  { el:"Tracking through app stores", status:"Signals lost at Unbounce → App Store", impact:"Cannot attribute installs or registrations back to campaigns.", sev:"critical", fix:"Implement deep linking / MMP" },
+];
+
+const headlineMatrix = [
+  { aud:"Affluent Investors", ease:"All-In-One Precious Metals App", trust:"Outlast Any Crisis with Gold", own:"Own What Can't Be Printed", ctrl:"Gold: The Ultimate Liquid Hedge", dig:"Ancient asset. Modern access." },
+  { aud:"Monetary Rebels", ease:"Digital Gold for Every Budget", trust:"Fight Inflation with Gold", own:"Hold Wealth Outside the System", ctrl:"Gold You Can Sell Anytime", dig:"Own Real Gold, Digitally" },
+  { aud:"Armchair Economists", ease:"Gold Investing Made Simple", trust:"A Smarter Way to Own Gold", own:"Invest in Gold You Truly Own", ctrl:"Your Financial Freedom Starts Here", dig:"Manage Gold on Your Phone" },
+  { aud:"Wealth Protectors", ease:"Lasting Wealth in a Few Clicks", trust:"Wealth That Lasts Generations", own:"Build Your Own Gold Reserve", ctrl:"Take Control of Your Wealth", dig:"Manage Your Wealth Digitally" },
+];
+
+const descriptions90 = [
+  { t:"Buy, sell, or redeem gold 24/7. No hidden costs, just low premiums and total liquidity.", m:"ALL" },
+  { t:"Real gold, owned by you. Audited and fully insured by Lloyd's of London.", m:"UK" },
+  { t:"Get gold at 0% premium. Buy, sell, or cash out anytime you want.", m:"UK" },
+  { t:"Add gold to your portfolio in a few clicks. Smart and simple.", m:"ALL" },
+  { t:"Whether you're new to gold or a seasoned buyer, we made it easy.", m:"ALL" },
+  { t:"Real direct-title ownership. No paper gold or ETFs—just real, redeemable metal.", m:"ALL" },
+  { t:"New to gold? You'll be set up in minutes. It's that simple.", m:"ALL" },
+  { t:"Buy and sell on your terms. Real gold, real liquidity, one app.", m:"ALL" },
+  { t:"Rated 4.7 stars. See why thousands trust OneGold for gold and silver.", m:"ALL" },
+  { t:"Not an ETF. Not paper gold. Real metal that you truly own.", m:"ALL" },
+];
+
+const videoScripts = [
+  { pillar:"Own Real Gold", scripts:[{teas:"Not Paper Gold. Real Gold.",body:"Physical gold managed digitally.",cta:"Start Investing Today"},{teas:"If you don't own it, you don't control it.",body:"Own physical gold—not a paper claim.",cta:"Take Control of Your Gold"},{teas:"Not an ETF. Not paper gold.",body:"Real gold—owned by you, stored in Swiss vaults.",cta:"Own Real Gold"}]},
+  { pillar:"Secure & Trustworthy", scripts:[{teas:"Gold Investment You Can Trust",body:"Insured and audited gold in Swiss vaults.",cta:"Try OneGold Today"}]},
+  { pillar:"Simple & Easy", scripts:[{teas:"Gold Investing, Simplified",body:"Buy, sell, and manage real gold in a few clicks.",cta:"Get Started"}]},
+  { pillar:"Wealth Protection", scripts:[{teas:"Real wealth deserves real assets.",body:"Own physical gold. Not paper.",cta:"Buy Gold Today"}]},
+];
+
+const euAdapt = [
+  { hl:"Gold Investing Made Simple", sc:"9/10", issue:"None — highest CTR per audit", fix:"Keep. Localize: 'Gold kaufen, einfach gemacht' (DE)", sev:"low" },
+  { hl:"Invest in Gold You Truly Own", sc:"8/10", issue:"Strong ownership message", fix:"Pair with fintech wedge for Meta campaigns", sev:"low" },
+  { hl:"Wealth That Lasts Generations", sc:"8/10", issue:"Strong for FR patrimoine", fix:"'Un patrimoine qui traverse les générations' (FR)", sev:"low" },
+  { hl:"All-In-One Precious Metals App", sc:"7/10", issue:"Generic — doesn't differentiate", fix:"Add 'Swiss-Vaulted' or '0.8% Premium' specificity", sev:"medium" },
+  { hl:"Digital Gold for Every Budget", sc:"6/10", issue:"'Digital gold' confuses with crypto in DACH", fix:"'Schweizer Gold für jedes Budget' in DACH", sev:"medium" },
+  { hl:"Hold Wealth Outside the System", sc:"5/10", issue:"Anti-establishment — dangerous in DACH/FR", fix:"UK only. Replace with benefit messaging in DE/FR.", sev:"high" },
+  { hl:"Outlast Any Crisis with Gold", sc:"4/10", issue:"⚠ Compliance — implies protection", fix:"Reframe: 'Diversify with Swiss-Vaulted Gold'", sev:"critical" },
+  { hl:"Fight Inflation with Gold", sc:"3/10", issue:"⚠ Compliance — implies hedge guarantee", fix:"Remove. Replace: 'From 0.8% premium'", sev:"critical" },
+  { hl:"Protect Your Wealth with Gold", sc:"3/10", issue:"⚠ Violates brief's own compliance note", fix:"Replace: 'Diversify Your Portfolio with Gold'", sev:"critical" },
+];
+
+const missingBrief = [
+  { el:"MKS PAMP as lead trust signal", imp:"Europe's #1 trust anchor. APMEX/Sprott = zero EU recognition.", p:"CRITICAL" },
+  { el:"0.8% premium in headlines", imp:"Destroys FlexGold's 2%. Must be visible in every CTA.", p:"CRITICAL" },
+  { el:"Compliance-safe alternatives for 3 flagged headlines", imp:"'Fight Inflation', 'Outlast Crisis', 'Protect Wealth' violate the brief's own note.", p:"CRITICAL" },
+  { el:"Market-specific competitor wedges", imp:"UK=anti-BV, DE=anti-FlexGold, FR=anti-VeraCash.", p:"HIGH" },
+  { el:"Fintech Gold Upgrader audience", imp:"29.6M Revolut/TR/Bitpanda visits. Largest EU opportunity.", p:"HIGH" },
+  { el:"Patrimoine vocabulary (FR)", imp:"VeraCash proves heritage language drives 361K FR visits.", p:"HIGH" },
+  { el:"Gold Sparplan framing (DE)", imp:"FlexGold made Sparplan resonant. OneGold undercuts 2x.", p:"HIGH" },
+  { el:"Price chart page ad destinations", imp:"BV price pages = 70%+ organic. No ads point there.", p:"MEDIUM" },
+];
+
+const toneMap = [
+  { mkt:"🇬🇧 UK", brief:"Accessible, slightly disruptive", eu:"Accessible, confident, simple", why:"BV is stuffy. Be modern. No TallyMoney-level irreverence." },
+  { mkt:"🇩🇪 Germany", brief:"Accessible, slightly disruptive", eu:"Precise, institutional, modern", why:"Formal Sie. Match FlexGold credibility, undercut on cost." },
+  { mkt:"🇫🇷 France", brief:"Accessible, slightly disruptive", eu:"Consultative, warm, patrimoine", why:"VeraCash proved heritage works. Guide, don't sell." },
+  { mkt:"🇮🇹 Italy", brief:"Accessible, slightly disruptive", eu:"Aspirational, accessible, educational", why:"No incumbent — you define the tone. Education-first." },
+];
+
+const lpTemplates = [
+  { name:"Fintech-Savvy / Monetary Rebels", c:SKY, hls:["Digital Gold for Every Budget","Own Real Gold, Digitally","Hold Wealth Outside the System"], note:"UK + IT only. Too disruptive for DACH/FR." },
+  { name:"Wealth Protectors", c:GOLD, hls:["Lasting Wealth in a Few Clicks","Wealth That Lasts Generations","Protect Your Wealth with Gold"], note:"Strong for FR + DACH. Flag 'Protect' for compliance." },
+  { name:"Armchair Economists", c:GREEN, hls:["Gold Investing Made Simple","Smart & simple diversification","Your Financial Freedom Starts Here"], note:"Best EU fit. Simplicity = highest CTR + anti-BV wedge." },
+];
+
+// ─── COMPONENTS ──────────────────────────────────────────────────────────
+function Acc({ title, sub, count, badge, bc, icon, children, open: defOpen = false }) {
+  const [o, setO] = useState(defOpen);
+  return (
+    <div style={{ marginBottom:8, borderRadius:10, border:`1px solid ${o?BORDER:BORDER_L}`, background:WHITE, overflow:"hidden", transition:"border-color 0.2s", boxShadow:o?"0 2px 8px rgba(15,43,60,0.06)":"none" }}>
+      <button onClick={()=>setO(!o)} style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"14px 20px", background:"transparent", border:"none", cursor:"pointer", textAlign:"left" }}>
+        <span style={{ color:NAVY_MID, fontSize:16, transition:"transform 0.2s", transform:o?"rotate(90deg)":"rotate(0)", flexShrink:0, fontWeight:700 }}>▸</span>
+        {icon && <span style={{ fontSize:18, flexShrink:0 }}>{icon}</span>}
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
+            <span style={{ fontSize:16, fontWeight:700, color:TEXT }}>{title}</span>
+            {badge && <span style={{ padding:"2px 9px", borderRadius:4, fontSize:11, fontWeight:700, letterSpacing:"0.04em", textTransform:"uppercase", background:(bc===RED?RED_BG:bc===GREEN?GREEN_BG:bc===ORANGE?ORANGE_BG:GOLD_BG), color:bc||GOLD, fontFamily:"'Merriweather Sans',sans-serif" }}>{badge}</span>}
+            {count!==undefined && <span style={{ padding:"2px 8px", borderRadius:10, fontSize:12, fontWeight:600, background:LIGHT, color:TEXT3, fontFamily:"'Merriweather Sans',sans-serif" }}>{count}</span>}
+          </div>
+          {sub && <div style={{ fontSize:14, color:TEXT3, marginTop:2 }}>{sub}</div>}
+        </div>
+      </button>
+      {o && <div style={{ padding:"0 20px 20px", borderTop:`1px solid ${BORDER_L}` }}>{children}</div>}
+    </div>
+  );
+}
+function Bdg({ children, color }) {
+  const bg = color==="critical"?RED_BG:color==="high"?GOLD_BG:color==="low"?GREEN_BG:color==="new"?ORANGE_BG:SKY_BG;
+  const fg = color==="critical"?RED:color==="high"?GOLD:color==="low"?GREEN:color==="new"?ORANGE:SKY;
+  return <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:4, fontSize:11, fontWeight:700, letterSpacing:"0.04em", textTransform:"uppercase", background:bg, color:fg, fontFamily:"'Merriweather Sans',sans-serif" }}>{children}</span>;
+}
+function MPill({ market }) {
+  const m = markets.find(x=>x.id===market);
+  return <span style={{ display:"inline-block", padding:"2px 7px", borderRadius:4, fontSize:11, fontWeight:500, background:LIGHT, color:TEXT2, marginRight:3, fontFamily:"'Merriweather Sans',sans-serif" }}>{m?.flag} {m?.id.toUpperCase()}</span>;
+}
+function SC({ label, value, sub, accent, isNew }) {
+  return (
+    <div style={{ background:WHITE, borderRadius:10, border:`1px solid ${isNew?ORANGE+"44":BORDER_L}`, padding:16, boxShadow:"0 1px 3px rgba(15,43,60,0.04)", position:"relative" }}>
+      {isNew && <span style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, color:ORANGE, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", background:ORANGE_BG, padding:"1px 6px", borderRadius:3 }}>Updated</span>}
+      <div style={{ fontSize:12, textTransform:"uppercase", letterSpacing:"0.08em", color:TEXT3, marginBottom:6, fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>{label}</div>
+      <div style={{ fontSize:26, fontWeight:700, fontFamily:"'Playfair Display',serif", color:accent||NAVY }}>{value}</div>
+      {sub && <div style={{ fontSize:13, color:TEXT3, marginTop:2 }}>{sub}</div>}
+    </div>
+  );
+}
+function PBar({ value, max, color=GOLD }) {
+  return <div style={{ width:"100%", height:6, background:LIGHT, borderRadius:3, overflow:"hidden" }}><div style={{ width:`${Math.min((value/max)*100,100)}%`, height:"100%", background:color, borderRadius:3 }} /></div>;
+}
+function TR({ task, priority, mkts, source, idx, checked, onToggle }) {
+  const [o, setO] = useState(false);
+  return (
+    <div style={{ padding:"10px 14px", background:checked?GREEN_BG:idx%2===0?WHITE:OFFWHITE, borderRadius:6, marginBottom:2, transition:"background 0.2s" }}>
+      <div style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
+        <div onClick={(e)=>{e.stopPropagation();onToggle();}} style={{ marginTop:2, cursor:"pointer", flexShrink:0, width:22, height:22, borderRadius:6, border:`2px solid ${checked?GREEN:BORDER}`, background:checked?GREEN:WHITE, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}>
+          {checked && <span style={{ color:WHITE, fontSize:14, fontWeight:700, lineHeight:1 }}>✓</span>}
+        </div>
+        <div style={{ flex:1, cursor:"pointer" }} onClick={()=>setO(!o)}>
+          <div style={{ display:"flex", alignItems:"center", gap:7, flexWrap:"wrap" }}>
+            <Bdg color={priority==="CRITICAL"?"critical":priority==="HIGH"?"high":"medium"}>{priority}</Bdg>
+            <span style={{ fontSize:14, color:checked?TEXT3:TEXT, fontWeight:500, lineHeight:1.4, textDecoration:checked?"line-through":"none", transition:"all 0.2s" }}>{task}</span>
+          </div>
+          {o && <div style={{ marginTop:6, display:"flex", gap:4, flexWrap:"wrap", alignItems:"center" }}>
+            {mkts.map(m=><MPill key={m} market={m} />)}<span style={{ fontSize:12, color:TEXT3, marginLeft:4 }}>Source: {source}</span>
+          </div>}
+        </div>
+        <span onClick={()=>setO(!o)} style={{ color:TEXT3, fontSize:10, marginTop:5, fontWeight:700, cursor:"pointer", flexShrink:0 }}>{o?"▾":"▸"}</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN ────────────────────────────────────────────────────────────────
+function App() {
+  const [aPhase, setAPhase] = useState(30);
+  const [aMkt, setAMkt] = useState("all");
+  const [aSec, setASec] = useState("overview");
+  const [done, setDone] = useState(new Set());
+  const tKey = (phId,ti,tki) => `${phId}-${ti}-${tki}`;
+  const toggle = (key) => setDone(prev => { const n = new Set(prev); n.has(key)?n.delete(key):n.add(key); return n; });
+  const isDone = (key) => done.has(key);
+  const ph = phases.find(p=>p.id===aPhase);
+  const fTr = ph?.tracks.map((t,ti)=>({...t, ti, tasks: (aMkt==="all"?t.tasks:t.tasks.filter(tk=>tk.markets.includes(aMkt))).map((tk,tki)=>({...tk, tki, key:tKey(ph.id,ti,t.tasks.indexOf(tk))}))})).filter(t=>t.tasks.length>0);
+  const tT = ph?.tracks.reduce((s,t)=>s+t.tasks.length,0)||0;
+  const tC = ph?.tracks.reduce((s,t)=>s+t.tasks.filter(tk=>tk.priority==="CRITICAL").length,0)||0;
+  const tDone = ph?.tracks.reduce((s,t,ti)=>s+t.tasks.filter((_,tki)=>isDone(tKey(ph.id,ti,tki))).length,0)||0;
+  const secs = [{id:"overview",l:"Overview"},{id:"markets",l:"Markets"},{id:"gaps",l:"Gaps"},{id:"messaging",l:"Messaging"},{id:"budget",l:"Budget"},{id:"kpis",l:"KPIs"},{id:"timeline",l:"30/60/90 Plan"}];
+  const ST = ({children}) => <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:700, color:NAVY, margin:"0 0 6px", letterSpacing:"-0.02em" }}>{children}</h2>;
+  const Sub = ({children}) => <p style={{ fontSize:15, color:TEXT3, margin:"0 0 20px", lineHeight:1.6 }}>{children}</p>;
+
+  return (
+    <div style={{ fontFamily:"'Merriweather',Georgia,serif", background:OFFWHITE, color:TEXT, minHeight:"100vh", lineHeight:1.6 }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Merriweather:wght@300;400;700;900&family=Merriweather+Sans:wght@400;500;600;700;800&display=swap');*{box-sizing:border-box}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:${BORDER};border-radius:3px}@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.fu{animation:fu .3s ease forwards}`}</style>
+
+      {/* HEADER */}
+      <div style={{ background:`linear-gradient(135deg, ${NAVY}, ${NAVY_LIGHT})`, padding:"16px 28px" }}>
+        <div style={{ maxWidth:1140, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <svg width="36" height="28" viewBox="0 0 36 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink:0 }}>
+              <rect x="2" y="2" width="22" height="5" rx="1.5" fill="#8AACCC" opacity="0.6" transform="skewX(-8)"/>
+              <rect x="3" y="10.5" width="26" height="5" rx="1.5" fill="#5B9ACF" opacity="0.8" transform="skewX(-8)"/>
+              <rect x="4" y="19" width="30" height="5" rx="1.5" fill="#3A7FBF" transform="skewX(-8)"/>
+            </svg>
+            <div><span style={{ fontSize:11, fontWeight:600, letterSpacing:"0.12em", textTransform:"uppercase", color:GOLD_LIGHT, fontFamily:"'Merriweather Sans',sans-serif" }}>OneGold Europe</span><h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:20, fontWeight:700, margin:0, color:WHITE }}>Digital Media Strategy & Plan</h1></div>
+          </div>
+          <div style={{ display:"flex", gap:8, fontSize:12, color:"rgba(255,255,255,0.65)", fontFamily:"'Merriweather Sans',sans-serif" }}>
+            {["March 2026","12-Mo Roadmap","UK·DE·FR·IT"].map(t=><span key={t} style={{ background:"rgba(255,255,255,0.1)", padding:"4px 10px", borderRadius:6 }}>{t}</span>)}
+            <span style={{ background:"rgba(212,138,32,0.25)", padding:"4px 10px", borderRadius:6, color:GOLD_LIGHT, fontWeight:600 }}>v2 — Post-Funnel Audit</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Gold divider */}
+      <div style={{ height:3, background:`linear-gradient(90deg, ${GOLD}, ${GOLD_LIGHT}, ${GOLD})` }} />
+
+      {/* NAV */}
+      <div style={{ background:"#E3EEF6", borderBottom:`1px solid #C5D8E8`, position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 4px rgba(15,43,60,0.06)" }}>
+        <div style={{ maxWidth:1140, margin:"0 auto", padding:"0 28px", display:"flex", gap:2, overflowX:"auto" }}>
+          {secs.map(s=><button key={s.id} onClick={()=>setASec(s.id)} style={{ padding:"12px 18px", border:"none", borderBottom:`3px solid ${aSec===s.id?GOLD:"transparent"}`, background:aSec===s.id?"rgba(255,255,255,0.7)":"transparent", color:aSec===s.id?NAVY:"#4A6275", fontSize:15, fontWeight:aSec===s.id?700:500, fontFamily:"'Merriweather Sans',sans-serif", cursor:"pointer", whiteSpace:"nowrap", transition:"all 0.15s", borderRadius:aSec===s.id?"6px 6px 0 0":"0" }}>{s.l}</button>)}
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div style={{ maxWidth:1140, margin:"0 auto", padding:"24px 28px 60px" }}>
+
+        {/* ═══ OVERVIEW ═══ */}
+        {aSec==="overview" && <div className="fu">
+          <ST>Strategy Overview</ST>
+          <Sub>Updated after CMO funnel audit — EU converts at 1-2% vs US at 8-11%. App fixes are now the #1 priority before scaling paid traffic.</Sub>
+
+          {/* Funnel alert banner */}
+          <div style={{ padding:"16px 20px", background:RED_BG, borderRadius:10, border:`1px solid ${RED}22`, marginBottom:20, display:"flex", gap:14, alignItems:"flex-start" }}>
+            <span style={{ fontSize:24 }}>🚨</span>
+            <div>
+              <div style={{ fontSize:16, fontWeight:700, color:RED, marginBottom:4 }}>Funnel Audit: Critical Conversion Gap Identified</div>
+              <div style={{ fontSize:14, color:TEXT2, lineHeight:1.6 }}>US checkout rate is 11% with 8.1% first purchase. EU (FR/UK/IT) has 3x fewer checkouts and 5-6x fewer first purchases. Root causes: wire-only payment, broken €100 popup, scam-looking payment email, US legal redirects at checkout, 4-vault complexity, and broken app-to-campaign attribution. <strong>Phase 1 is now "Fix the Funnel" before scaling traffic.</strong></div>
+            </div>
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(170px,1fr))", gap:10, marginBottom:24 }}>
+            <SC label="EU Checkout Rate" value="~3%" sub="vs 11% US" accent={RED} isNew />
+            <SC label="EU First Purchase" value="~1.5%" sub="vs 8.1% US (5-6x gap)" accent={RED} isNew />
+            <SC label="Current EU Visits" value="2,600/mo" sub="4% of total traffic" accent={TEXT3} />
+            <SC label="12-Month Target" value="50,000/mo" sub="19x growth" accent={GREEN} />
+            <SC label="12-Mo Investment" value="$685,500" sub="All channels" accent={NAVY} />
+          </div>
+
+          <Acc title="Four Strategic Pillars" sub="Funnel-first, then traffic — order matters" icon="🏗️" count={4} open>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))", gap:12, paddingTop:12 }}>
+              {strategicPillars.map((p,i)=>(
+                <div key={i} style={{ background:OFFWHITE, borderRadius:8, padding:18, border:`1px solid ${p.isNew?ORANGE+"44":BORDER_L}`, position:"relative" }}>
+                  {p.isNew && <span style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, color:ORANGE, background:ORANGE_BG, padding:"1px 6px", borderRadius:3, fontFamily:"'Merriweather Sans',sans-serif", textTransform:"uppercase" }}>New</span>}
+                  <span style={{ fontSize:28 }}>{p.icon}</span>
+                  <div style={{ fontSize:16, fontWeight:700, color:NAVY, margin:"8px 0 6px", fontFamily:"'Playfair Display',serif" }}>{p.title}</div>
+                  <p style={{ fontSize:14, color:TEXT2, lineHeight:1.5, margin:"0 0 12px" }}>{p.desc}</p>
+                  <div style={{ padding:"8px 12px", background:p.isNew?ORANGE_BG:GOLD_BG, borderRadius:6, fontSize:13, color:p.isNew?ORANGE:GOLD, fontWeight:600, borderLeft:`3px solid ${p.isNew?ORANGE:GOLD}` }}>{p.metric}</div>
+                </div>
+              ))}
+            </div>
+          </Acc>
+
+          <Acc title="Competitive Positioning Map" icon="🗺️" sub="White space: Trust/Consumer quadrant in 4 languages">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:0, minHeight:220, paddingTop:12 }}>
+              <div style={{ background:OFFWHITE, borderRadius:"10px 0 0 0", border:`1px solid ${BORDER}`, borderRight:"none", borderBottom:"none", padding:16 }}>
+                <div style={{ fontSize:12, color:TEXT3, fontWeight:600, textTransform:"uppercase", marginBottom:8, fontFamily:"'Merriweather Sans',sans-serif" }}>← Trust · Expert ↑</div>
+                {[{n:"BullionVault",d:"Order board, 0.5% commission"},{n:"FlexGold",d:"Sparplan, 2% premium"}].map(c=><div key={c.n} style={{ marginBottom:6 }}><div style={{ fontSize:15, fontWeight:600, color:NAVY }}>{c.n}</div><div style={{ fontSize:13, color:TEXT3 }}>{c.d}</div></div>)}
+              </div>
+              <div style={{ background:SKY_LIGHT, borderRadius:"0 10px 0 0", border:`1px solid ${BORDER}`, borderBottom:"none", padding:16 }}>
+                <div style={{ fontSize:12, color:TEXT3, fontWeight:600, textTransform:"uppercase", textAlign:"right", marginBottom:8, fontFamily:"'Merriweather Sans',sans-serif" }}>Convenience → · Expert ↑</div>
+                <div style={{ fontSize:15, fontWeight:600, color:NAVY }}>Kinesis</div><div style={{ fontSize:13, color:TEXT3 }}>Yield, KAU/KAG tokens</div>
+              </div>
+              <div style={{ background:`linear-gradient(135deg, rgba(200,151,46,0.12), rgba(200,151,46,0.04))`, borderRadius:"0 0 0 10px", border:`2px solid ${GOLD}55`, padding:16, position:"relative" }}>
+                <span style={{ position:"absolute", top:8, right:10, background:GOLD, color:WHITE, padding:"3px 8px", borderRadius:4, fontSize:10, fontWeight:700, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Opportunity</span>
+                <div style={{ fontSize:18, fontWeight:700, color:GOLD, fontFamily:"'Playfair Display',serif", margin:"10px 0 4px" }}>OneGold</div>
+                <div style={{ fontSize:14, color:NAVY, lineHeight:1.5 }}>MKS PAMP trust + consumer simplicity + 4 languages</div>
+              </div>
+              <div style={{ background:GREEN_BG, borderRadius:"0 0 10px 0", border:`1px solid ${BORDER}`, borderLeft:"none", padding:16 }}>
+                {[{n:"Glint",d:"App-first, Mastercard"},{n:"TallyMoney",d:"Anti-bank"},{n:"VeraCash",d:"Patrimoine, French heritage"}].map(c=><div key={c.n} style={{ marginBottom:4 }}><div style={{ fontSize:15, fontWeight:600, color:NAVY }}>{c.n}</div><div style={{ fontSize:13, color:TEXT3 }}>{c.d}</div></div>)}
+                <div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", marginTop:6, fontFamily:"'Merriweather Sans',sans-serif" }}>↓ Consumer · Convenience →</div>
+              </div>
+            </div>
+          </Acc>
+
+          <Acc title="Two Conversion Wedges" icon="🔀" sub="Cost transparency vs specialists + ownership gap vs fintechs">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, paddingTop:12 }}>
+              {[{l:"Wedge A",n:"Cost Transparency",c:GOLD,bg:GOLD_BG,d:"0.8% vs FlexGold's 2% and BV's 0.5% + $48 min storage. Interactive calculator as decision weapon.",tags:["0.8%","$20/yr","Fee calc"]},{l:"Wedge B",n:"Ownership Gap",c:SKY,bg:SKY_BG,d:"29.6M fintech visits. 'Your Revolut gold isn't really yours.' Shortest education cycle.",tags:["29.6M visits","Ownership","Compare pages"]}].map((w,i)=>(
+                <div key={i} style={{ background:OFFWHITE, borderRadius:8, padding:18, border:`1px solid ${BORDER_L}`, borderLeft:`4px solid ${w.c}` }}>
+                  <div style={{ fontSize:12, color:w.c, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"'Merriweather Sans',sans-serif" }}>{w.l}</div>
+                  <div style={{ fontSize:18, fontWeight:700, color:NAVY, fontFamily:"'Playfair Display',serif", margin:"4px 0 8px" }}>{w.n}</div>
+                  <p style={{ fontSize:14, color:TEXT2, lineHeight:1.5, margin:"0 0 10px" }}>{w.d}</p>
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>{w.tags.map(t=><span key={t} style={{ padding:"3px 10px", borderRadius:4, fontSize:13, background:w.bg, color:w.c, fontWeight:500 }}>{t}</span>)}</div>
+                </div>
+              ))}
+            </div>
+          </Acc>
+        </div>}
+
+        {/* ═══ TIMELINE ═══ */}
+        {aSec==="timeline" && <div className="fu">
+          <ST>30 / 60 / 90 Day Execution Plan</ST>
+          <Sub>Restructured: Phase 1 is now "Fix the Funnel" — app UX, tracking, and video production before scaling traffic. SEO moved to Phase 2.</Sub>
+          <div style={{ display:"flex", gap:4, background:WHITE, borderRadius:8, padding:4, marginBottom:16, border:`1px solid ${BORDER_L}`, flexWrap:"wrap" }}>
+            {phases.map(p=><button key={p.id} onClick={()=>setAPhase(p.id)} style={{ padding:"10px 18px", borderRadius:6, border:"none", cursor:"pointer", fontSize:14, fontWeight:aPhase===p.id?700:400, fontFamily:"'Merriweather Sans',sans-serif", background:aPhase===p.id?NAVY:"transparent", color:aPhase===p.id?WHITE:TEXT3, flex:"1 1 auto" }}>{p.label} · {p.title}</button>)}
+          </div>
+          <div style={{ display:"flex", gap:6, marginBottom:14, flexWrap:"wrap", alignItems:"center" }}>
+            <span style={{ fontSize:13, color:TEXT3 }}>Market:</span>
+            {[{id:"all",l:"All"},...markets.map(m=>({id:m.id,l:`${m.flag} ${m.id.toUpperCase()}`}))].map(o=>(
+              <button key={o.id} onClick={()=>setAMkt(o.id)} style={{ padding:"5px 12px", borderRadius:6, border:`1px solid ${aMkt===o.id?NAVY:BORDER}`, background:aMkt===o.id?NAVY:WHITE, color:aMkt===o.id?WHITE:TEXT2, fontSize:13, cursor:"pointer", fontWeight:500, fontFamily:"'Merriweather Sans',sans-serif" }}>{o.l}</button>
+            ))}
+          </div>
+          <div style={{ display:"flex", gap:14, marginBottom:16, padding:"14px 20px", background:WHITE, borderRadius:10, border:`1px solid ${ph.color}33`, alignItems:"center", flexWrap:"wrap", boxShadow:"0 1px 4px rgba(15,43,60,0.04)" }}>
+            <div style={{ flex:1, minWidth:160 }}>
+              <div style={{ fontSize:13, color:ph.color, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em", fontFamily:"'Merriweather Sans',sans-serif" }}>{ph.label}</div>
+              <div style={{ fontSize:22, fontWeight:700, color:NAVY, fontFamily:"'Playfair Display',serif" }}>{ph.title}</div>
+              <div style={{ fontSize:14, color:TEXT3 }}>{ph.subtitle}</div>
+              <div style={{ marginTop:10, display:"flex", alignItems:"center", gap:10 }}>
+                <PBar value={tDone} max={tT} color={tDone===tT?GREEN:SKY} />
+                <span style={{ fontSize:13, fontWeight:600, color:tDone===tT?GREEN:SKY, fontFamily:"'Merriweather Sans',sans-serif", whiteSpace:"nowrap" }}>{tDone}/{tT}</span>
+              </div>
+            </div>
+            <div style={{ textAlign:"center", padding:"0 14px" }}><div style={{ fontSize:26, fontWeight:700, color:GREEN, fontFamily:"'Playfair Display',serif" }}>{tDone}</div><div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Done</div></div>
+            <div style={{ textAlign:"center", padding:"0 14px" }}><div style={{ fontSize:26, fontWeight:700, color:NAVY, fontFamily:"'Playfair Display',serif" }}>{tT}</div><div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Total</div></div>
+            <div style={{ textAlign:"center", padding:"0 14px" }}><div style={{ fontSize:26, fontWeight:700, color:RED, fontFamily:"'Playfair Display',serif" }}>{tC}</div><div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Critical</div></div>
+            <div style={{ textAlign:"center", padding:"0 14px" }}><div style={{ fontSize:16, fontWeight:700, color:GOLD }}>{ph.budget}</div><div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Budget</div></div>
+          </div>
+          {fTr?.map((t,ti)=>{
+            const trackDone = t.tasks.filter(tk=>isDone(tk.key)).length;
+            return (
+            <Acc key={ti} title={t.name} icon={t.icon} count={`${trackDone}/${t.tasks.length}`} sub={t.desc} badge={trackDone===t.tasks.length&&t.tasks.length>0?"complete":t.tasks.filter(tk=>tk.priority==="CRITICAL").length>0?`${t.tasks.filter(tk=>tk.priority==="CRITICAL").length} critical`:undefined} bc={trackDone===t.tasks.length&&t.tasks.length>0?GREEN:RED} open={ti===0}>
+              {t.tasks.map((tk,i)=><TR key={i} idx={i} task={tk.task} priority={tk.priority} mkts={tk.markets} source={tk.source} checked={isDone(tk.key)} onToggle={()=>toggle(tk.key)} />)}
+            </Acc>
+          )})}
+        </div>}
+
+        {/* ═══ MARKETS ═══ */}
+        {aSec==="markets" && <div className="fu">
+          <ST>Market Intelligence</ST>
+          <Sub>All 4 markets active — competitive positioning, keyword opportunities, and funnel-stage SEO mapping per market.</Sub>
+
+          {/* Competitor Feature Matrix */}
+          <Acc title="Competitive Feature Matrix" icon="⚔️" sub="OneGold vs 10 European competitors — pricing, features, payments, and languages at a glance" count={compMatrix.rows.length} open>
+            <div style={{ overflowX:"auto", paddingTop:8, paddingBottom:4 }}>
+              <table style={{ borderCollapse:"separate", borderSpacing:"0 2px", fontSize:13, minWidth:900, width:"100%" }}>
+                <thead><tr>
+                  <th style={{ textAlign:"left", padding:"8px 10px", fontSize:11, textTransform:"uppercase", letterSpacing:"0.06em", color:TEXT3, borderBottom:`2px solid ${BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif", position:"sticky", left:0, background:WHITE, zIndex:2, minWidth:130 }}>Feature</th>
+                  {compMatrix.cols.map((c,ci)=>(
+                    <th key={ci} style={{ textAlign:"center", padding:"8px 8px", fontSize:ci===0?12:11, textTransform:"uppercase", letterSpacing:"0.04em", color:ci===0?GOLD:TEXT3, borderBottom:`2px solid ${ci===0?GOLD:BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif", background:ci===0?GOLD_BG:WHITE, minWidth:90 }}>{c}</th>
+                  ))}
+                </tr></thead>
+                <tbody>{compMatrix.rows.map((r,ri)=>(
+                  <tr key={ri} style={{ background:ri%2===0?OFFWHITE:WHITE }}>
+                    <td style={{ padding:"9px 10px", fontWeight:600, color:NAVY, borderRadius:"6px 0 0 6px", position:"sticky", left:0, background:ri%2===0?OFFWHITE:WHITE, zIndex:1, fontSize:13 }}>{r.label}</td>
+                    {r.vals.map((v,vi)=>{
+                      const isOG = vi===0;
+                      const isWin = r.ogWin && r.ogWin[vi] && !isOG;
+                      const isGap = isOG && r.ogGap;
+                      return (
+                        <td key={vi} style={{
+                          padding:"9px 8px", textAlign:"center", fontSize:isOG?14:13,
+                          fontWeight:isOG?700:v.includes("✅")||v.includes("❌")?400:500,
+                          color: isGap?RED : isOG?NAVY : isWin?RED : v.includes("❌")?TEXT3 : TEXT2,
+                          background: isOG?GOLD_BG : isWin?GREEN_BG : "transparent",
+                          borderRadius: vi===r.vals.length-1?"0 6px 6px 0":"0",
+                        }}>{v}</td>
+                      );
+                    })}
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+            <div style={{ display:"flex", gap:14, marginTop:10, flexWrap:"wrap", fontSize:12 }}>
+              <span style={{ display:"flex", alignItems:"center", gap:5 }}><span style={{ width:14, height:14, borderRadius:3, background:GOLD_BG, border:`1px solid ${GOLD}33` }} /> OneGold</span>
+              <span style={{ display:"flex", alignItems:"center", gap:5 }}><span style={{ width:14, height:14, borderRadius:3, background:GREEN_BG, border:`1px solid ${GREEN}33` }} /> <span style={{ color:TEXT2 }}>Competitor weakness (OneGold advantage)</span></span>
+              <span style={{ display:"flex", alignItems:"center", gap:5 }}><span style={{ color:RED, fontWeight:600 }}>⚠️</span> <span style={{ color:TEXT2 }}>OneGold gap (needs fix)</span></span>
+            </div>
+          </Acc>
+
+          {markets.map((m,mi)=>{ const seo = marketSEO[m.id]; return (
+            <div key={mi} style={{ background:WHITE, borderRadius:10, border:`1px solid ${BORDER_L}`, marginBottom:14, boxShadow:"0 1px 4px rgba(15,43,60,0.04)", overflow:"hidden" }}>
+              {/* Market header */}
+              <div style={{ padding:"20px 24px", borderBottom:`1px solid ${BORDER_L}` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:14, flexWrap:"wrap" }}>
+                  <span style={{ fontSize:36 }}>{m.flag}</span>
+                  <div style={{ flex:1, minWidth:160 }}>
+                    <div style={{ fontSize:22, fontWeight:700, fontFamily:"'Playfair Display',serif", color:NAVY }}>{m.name}</div>
+                    <div style={{ fontSize:14, color:TEXT3 }}>{m.budget}% of paid budget · vs. {m.competitor}</div>
+                  </div>
+                  <div style={{ display:"flex", gap:10 }}>
+                    <div style={{ background:OFFWHITE, borderRadius:8, padding:"8px 14px", textAlign:"center" }}><div style={{ fontSize:11, color:TEXT3, textTransform:"uppercase", fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>Competitor</div><div style={{ fontSize:18, fontWeight:700, color:NAVY }}>{m.visits}/mo</div></div>
+                    <div style={{ background:OFFWHITE, borderRadius:8, padding:"8px 14px", textAlign:"center" }}><div style={{ fontSize:11, color:TEXT3, textTransform:"uppercase", fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>CPI</div><div style={{ fontSize:18, fontWeight:700, color:NAVY }}>{m.cpi}</div></div>
+                    <div style={{ background:GOLD_BG, borderRadius:8, padding:"8px 14px", textAlign:"center", border:`1px solid ${GOLD}22` }}><div style={{ fontSize:11, color:GOLD, textTransform:"uppercase", fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>Budget</div><div style={{ fontSize:18, fontWeight:700, color:GOLD }}>{m.budget}%</div></div>
+                  </div>
+                </div>
+                <div style={{ display:"flex", gap:16, marginTop:14, flexWrap:"wrap" }}>
+                  <div style={{ flex:"1 1 200px" }}><div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif", marginBottom:2 }}>Wedge Strategy</div><div style={{ fontSize:15, color:GOLD, fontWeight:600 }}>{m.wedge}</div></div>
+                  <div style={{ flex:"1 1 280px" }}><div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif", marginBottom:2 }}>Hero CTA</div><div style={{ fontSize:16, fontWeight:600, color:NAVY, fontStyle:"italic", fontFamily:"'Playfair Display',serif" }}>"{m.cta}"</div></div>
+                </div>
+              </div>
+              {/* SEO Content inside card */}
+              <div style={{ padding:"4px 8px 8px" }}>
+                {/* SEO Insight */}
+                <div style={{ padding:"14px 16px", margin:"8px 0", background:SKY_LIGHT, borderRadius:8, borderLeft:`4px solid ${SKY}`, fontSize:14, color:TEXT2, lineHeight:1.5 }}>
+                  <strong style={{ color:NAVY }}>SEO Insight:</strong> {seo.insight}
+                </div>
+
+                {/* Keyword Table */}
+                <Acc title={`Keyword Opportunities (${seo.keywords.length})`} icon="🔍" count={seo.keywords.length} sub={`Top search terms for ${m.name} — volume, difficulty, competitor gaps`} open={mi===0}>
+                  <div style={{ overflowX:"auto", paddingTop:8 }}>
+                    <table style={{ width:"100%", borderCollapse:"separate", borderSpacing:"0 2px", fontSize:13 }}>
+                      <thead><tr>
+                        {["Keyword","Volume","Difficulty","Competitor Gap","Priority","Content Target"].map(h=>(
+                          <th key={h} style={{ textAlign:"left", padding:"8px 10px", fontSize:11, textTransform:"uppercase", letterSpacing:"0.06em", color:TEXT3, borderBottom:`2px solid ${BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif", whiteSpace:"nowrap" }}>{h}</th>
+                        ))}
+                      </tr></thead>
+                      <tbody>{seo.keywords.map((k,ki)=>(
+                        <tr key={ki} style={{ background:ki%2===0?OFFWHITE:WHITE }}>
+                          <td style={{ padding:"9px 10px", fontWeight:600, color:NAVY, borderRadius:"6px 0 0 6px", minWidth:160 }}>{k.kw}</td>
+                          <td style={{ padding:"9px 10px", color:TEXT, fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>{k.vol}</td>
+                          <td style={{ padding:"9px 10px" }}><span style={{ padding:"2px 8px", borderRadius:4, fontSize:11, fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif", background:k.diff.startsWith("High")?RED_BG:k.diff.startsWith("Med")?ORANGE_BG:GREEN_BG, color:k.diff.startsWith("High")?RED:k.diff.startsWith("Med")?ORANGE:GREEN }}>{k.diff}</span></td>
+                          <td style={{ padding:"9px 10px", color:TEXT2, fontSize:13 }}>{k.gap}</td>
+                          <td style={{ padding:"9px 10px" }}><Bdg color={k.pri==="CRITICAL"?"critical":k.pri==="HIGH"?"high":"medium"}>{k.pri}</Bdg></td>
+                          <td style={{ padding:"9px 10px", color:SKY, fontWeight:500, borderRadius:"0 6px 6px 0", fontSize:13 }}>{k.content}</td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  </div>
+                </Acc>
+
+                {/* Funnel Stage Map */}
+                <Acc title="Funnel-Stage Keyword Map" icon="📊" sub={`Awareness → Consideration → Decision keywords for ${m.name}`} count={3}>
+                  <div style={{ paddingTop:8 }}>
+                    {seo.funnel.map((f,fi)=>{
+                      const stColor = fi===0?SKY:fi===1?GOLD:GREEN;
+                      const stBg = fi===0?SKY_BG:fi===1?GOLD_BG:GREEN_BG;
+                      return (
+                        <div key={fi} style={{ padding:"14px 16px", background:fi%2===0?OFFWHITE:WHITE, borderRadius:8, marginBottom:4, borderLeft:`4px solid ${stColor}` }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                            <span style={{ padding:"2px 10px", borderRadius:4, fontSize:11, fontWeight:700, textTransform:"uppercase", background:stBg, color:stColor, fontFamily:"'Merriweather Sans',sans-serif" }}>{f.stage}</span>
+                          </div>
+                          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                            <div>
+                              <div style={{ fontSize:12, color:TEXT3, fontWeight:600, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:3 }}>Target Keywords</div>
+                              <div style={{ fontSize:14, color:NAVY, fontWeight:500 }}>{f.keywords}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize:12, color:TEXT3, fontWeight:600, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:3 }}>Content Format</div>
+                              <div style={{ fontSize:14, color:TEXT2 }}>{f.content}</div>
+                            </div>
+                          </div>
+                          <div style={{ marginTop:8, fontSize:13, color:stColor, fontWeight:500 }}>↳ {f.status}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Acc>
+
+                {/* CTA Analysis */}
+                {(()=>{ const cta = marketCTA[m.id]; return (
+                <Acc title={`CTA Strategy vs ${cta.competitor.name}`} icon="🎯" sub={`Competitor assessment + OneGold recommended CTAs for ${m.name}`} count={cta.ctas.length}>
+                  <div style={{ paddingTop:8 }}>
+                    {/* Competitor assessment */}
+                    <div style={{ padding:"14px 16px", background:OFFWHITE, borderRadius:8, border:`1px solid ${BORDER_L}`, marginBottom:12 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, flexWrap:"wrap" }}>
+                        <div style={{ fontSize:16, fontWeight:700, color:NAVY }}>{cta.competitor.name}</div>
+                        {cta.competitor.scores && <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+                          {Object.entries(cta.competitor.scores).map(([k,v])=>(
+                            <span key={k} style={{ padding:"2px 7px", borderRadius:4, fontSize:10, fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif", background:v>=8?GREEN_BG:v>=6?GOLD_BG:RED_BG, color:v>=8?GREEN:v>=6?GOLD:RED }}>{k} {v}/10</span>
+                          ))}
+                        </div>}
+                      </div>
+                      {cta.competitor.visits!=="~0" && <div style={{ display:"flex", gap:12, marginBottom:10, flexWrap:"wrap" }}>
+                        <span style={{ fontSize:13, color:TEXT2 }}><strong style={{ color:NAVY }}>{cta.competitor.visits}</strong> EU visits</span>
+                        {cta.competitor.branded!=="N/A" && <span style={{ fontSize:13, color:TEXT2 }}><strong style={{ color:NAVY }}>{cta.competitor.branded}</strong> branded</span>}
+                        <span style={{ fontSize:13, color:TEXT2 }}><strong style={{ color:NAVY }}>{cta.competitor.bounce}</strong> bounce</span>
+                        <span style={{ fontSize:13, color:TEXT2 }}><strong style={{ color:NAVY }}>{cta.competitor.pages}</strong> pages/visit</span>
+                      </div>}
+                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                        <div><div style={{ fontSize:12, color:GREEN, fontWeight:600, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:3 }}>Strengths</div><div style={{ fontSize:13, color:TEXT2, lineHeight:1.5 }}>{cta.competitor.strengths}</div></div>
+                        <div><div style={{ fontSize:12, color:RED, fontWeight:600, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:3 }}>Weaknesses</div><div style={{ fontSize:13, color:TEXT2, lineHeight:1.5 }}>{cta.competitor.weaknesses}</div></div>
+                      </div>
+                    </div>
+
+                    {/* Wedge insight */}
+                    <div style={{ padding:"12px 16px", background:GOLD_BG, borderRadius:8, borderLeft:`4px solid ${GOLD}`, marginBottom:12 }}>
+                      <div style={{ fontSize:12, color:GOLD, fontWeight:700, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:4 }}>Wedge Insight</div>
+                      <div style={{ fontSize:14, color:TEXT, lineHeight:1.5 }}>{cta.wedgeInsight}</div>
+                    </div>
+
+                    {/* Recommended CTAs */}
+                    <div style={{ fontSize:13, fontWeight:700, color:NAVY, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:8, letterSpacing:"0.06em" }}>Recommended CTAs for {m.name}</div>
+                    {cta.ctas.map((c,ci)=>(
+                      <div key={ci} style={{ padding:"14px 16px", background:ci%2===0?OFFWHITE:WHITE, borderRadius:8, marginBottom:4, borderLeft:`4px solid ${GOLD}` }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6, flexWrap:"wrap" }}>
+                          <span style={{ padding:"2px 9px", borderRadius:4, fontSize:11, fontWeight:700, background:GOLD_BG, color:GOLD, fontFamily:"'Merriweather Sans',sans-serif", textTransform:"uppercase" }}>{c.label}</span>
+                          <span style={{ padding:"2px 9px", borderRadius:4, fontSize:11, fontWeight:600, background:c.impact.startsWith("Very")?GREEN_BG:SKY_BG, color:c.impact.startsWith("Very")?GREEN:SKY, fontFamily:"'Merriweather Sans',sans-serif" }}>{c.impact} impact</span>
+                          <span style={{ fontSize:12, color:TEXT3, marginLeft:"auto", fontFamily:"'Merriweather Sans',sans-serif" }}>{c.timing}</span>
+                        </div>
+                        <div style={{ fontSize:17, fontWeight:700, color:NAVY, fontFamily:"'Playfair Display',serif", marginBottom:3 }}>"{c.button}"</div>
+                        <div style={{ fontSize:14, color:TEXT2, fontStyle:"italic", marginBottom:6 }}>{c.sub}</div>
+                        <div style={{ fontSize:13, color:TEXT3 }}><strong style={{ color:TEXT2 }}>Placement:</strong> {c.placement}</div>
+                      </div>
+                    ))}
+
+                    {/* A/B Tests */}
+                    <div style={{ marginTop:12, padding:"14px 16px", background:SKY_LIGHT, borderRadius:8, borderLeft:`4px solid ${SKY}` }}>
+                      <div style={{ fontSize:12, color:SKY, fontWeight:700, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif", marginBottom:8 }}>A/B Tests for {m.name}</div>
+                      {cta.tests.map((t,ti)=>(
+                        <div key={ti} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:ti<cta.tests.length-1?6:0 }}>
+                          <span style={{ width:22, height:22, minWidth:22, borderRadius:11, background:SKY_BG, color:SKY, fontSize:12, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Merriweather Sans',sans-serif", border:`1px solid ${SKY}33` }}>{ti+1}</span>
+                          <div>
+                            <div style={{ fontSize:14, fontWeight:600, color:NAVY }}>{t.test}</div>
+                            <div style={{ fontSize:13, color:TEXT3 }}>Metric: {t.metric} · Traffic: {t.traffic}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Acc>
+                ); })()}
+              </div>
+            </div>
+          );})}
+        </div>}
+
+        {/* ═══ GAPS ═══ */}
+        {aSec==="gaps" && <div className="fu">
+          <ST>Creative & Funnel Gaps</ST>
+          <Sub>Two layers: messaging gaps in ad copy ($58.8K spend) and critical funnel gaps blocking conversion (1-2% EU rate).</Sub>
+          <Acc title="App & Funnel Issues (CMO Audit)" sub="These block conversion before messaging even matters" icon="🚨" badge={`${funnelIssues.filter(f=>f.sev==="critical").length} critical`} bc={RED} count={funnelIssues.length} open>
+            <div style={{ paddingTop:12 }}>{funnelIssues.map((f,i)=>(
+              <div key={i} style={{ display:"flex", gap:12, padding:"12px 14px", background:i%2===0?OFFWHITE:WHITE, borderRadius:6, marginBottom:3, alignItems:"flex-start" }}>
+                <div style={{ minWidth:170 }}><div style={{ fontSize:14, fontWeight:700, color:NAVY, marginBottom:4 }}>{f.el}</div><Bdg color={f.sev}>{f.sev}</Bdg></div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:13, color:TEXT2, marginBottom:2 }}><strong style={{ color:RED }}>Status:</strong> {f.status}</div>
+                  <div style={{ fontSize:13, color:TEXT2, marginBottom:2 }}><strong>Impact:</strong> {f.impact}</div>
+                  <div style={{ fontSize:13, color:GREEN, fontWeight:500 }}>→ {f.fix}</div>
+                </div>
+              </div>
+            ))}</div>
+          </Acc>
+          <Acc title="Missing Messaging Elements in Ads" sub="Strategy recommendations vs current ad copy" icon="📋" badge={`${competitorGaps.filter(g=>g.sev==="critical").length} critical`} bc={RED} count={competitorGaps.length}>
+            <div style={{ overflowX:"auto", paddingTop:12 }}><table style={{ width:"100%", borderCollapse:"separate", borderSpacing:"0 3px", fontSize:14 }}>
+              <thead><tr>{["Element","Strategy Recommends","Current Status",""].map(h=><th key={h} style={{ textAlign:"left", padding:"8px 12px", fontSize:12, textTransform:"uppercase", letterSpacing:"0.06em", color:TEXT3, borderBottom:`2px solid ${BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif" }}>{h}</th>)}</tr></thead>
+              <tbody>{competitorGaps.map((g,i)=><tr key={i} style={{ background:i%2===0?OFFWHITE:WHITE }}><td style={{ padding:"10px 12px", fontWeight:600, color:NAVY, borderRadius:"6px 0 0 6px" }}>{g.el}</td><td style={{ padding:"10px 12px", color:TEXT2 }}>{g.strat}</td><td style={{ padding:"10px 12px", color:g.sev==="critical"?RED:GOLD, fontWeight:500 }}>{g.cur}</td><td style={{ padding:"10px 12px", borderRadius:"0 6px 6px 0" }}><Bdg color={g.sev}>{g.sev}</Bdg></td></tr>)}</tbody>
+            </table></div>
+          </Acc>
+          <Acc title="ESK Campaign Performance by Market" sub="Italy $0.04 CPI vs UK $10.10 — dramatic variance" icon="📈" count={5}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))", gap:10, paddingTop:12 }}>
+              {[{m:"🇮🇹 Italy",cpi:"$0.04",rate:"17.1%",st:"★ TOP",c:GREEN},{m:"🌍 EN (Intl)",cpi:"$0.07",rate:"13.0%",st:"★ STRONG",c:SKY},{m:"🇩🇪 Germany",cpi:"$0.52",rate:"4.7%",st:"⚠ MIXED",c:GOLD},{m:"🇫🇷 France",cpi:"$0.42",rate:"3.7%",st:"⛔ CRITICAL",c:RED},{m:"🇬🇧 UK",cpi:"$0.77",rate:"3.2%",st:"⚠ UNDER",c:RED}].map((r,i)=>(
+                <div key={i} style={{ background:WHITE, borderRadius:8, padding:16, border:`1px solid ${BORDER_L}` }}>
+                  <div style={{ fontSize:16, fontWeight:600, color:NAVY, marginBottom:8 }}>{r.m}</div>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}><span style={{ fontSize:14, color:TEXT3 }}>CPI</span><span style={{ fontSize:16, fontWeight:700, color:r.c }}>{r.cpi}</span></div>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}><span style={{ fontSize:14, color:TEXT3 }}>Int. Rate</span><span style={{ fontSize:16, fontWeight:700, color:NAVY }}>{r.rate}</span></div>
+                  <div style={{ fontSize:12, fontWeight:700, color:r.c, textAlign:"center", padding:"4px 0", background:r.c===RED?RED_BG:r.c===GREEN?GREEN_BG:r.c===SKY?SKY_BG:GOLD_BG, borderRadius:4, fontFamily:"'Merriweather Sans',sans-serif" }}>{r.st}</div>
+                </div>
+              ))}
+            </div>
+          </Acc>
+        </div>}
+
+        {/* ═══ MESSAGING ═══ */}
+        {aSec==="messaging" && <div className="fu">
+          <ST>Messaging Update</ST>
+          <Sub>Cross-referencing the proposed messaging brief against competitive data, campaign audit, and EU localization requirements.</Sub>
+          <Acc title="Performance Audit: What Converts in Europe" sub="EU data: simplicity wins, generic 'Buy Gold' loses" icon="📊" open>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, paddingTop:12 }}>
+              <div><div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:10 }}><span style={{ width:8, height:8, borderRadius:4, background:GREEN }} /><span style={{ fontSize:13, fontWeight:600, color:GREEN, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Highest CTR</span></div>
+                {["Simplicity — 'Silver buying made simple'","Ease of use — 'Buy and Sell on mobile App'","Diversification headlines"].map((h,i)=><div key={i} style={{ padding:"10px 14px", background:GREEN_BG, borderRadius:6, marginBottom:4, fontSize:14, color:TEXT, borderLeft:`3px solid ${GREEN}` }}>{h}</div>)}
+              </div>
+              <div><div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:10 }}><span style={{ width:8, height:8, borderRadius:4, background:RED }} /><span style={{ fontSize:13, fontWeight:600, color:RED, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>Lowest CTR</span></div>
+                {["VAT — 'Buy VAT-free Silver'","Generic 'Buy Gold' headlines","Physical gold/silver bar images"].map((l,i)=><div key={i} style={{ padding:"10px 14px", background:RED_BG, borderRadius:6, marginBottom:4, fontSize:14, color:TEXT2, borderLeft:`3px solid ${RED}` }}>{l}</div>)}
+              </div>
+            </div>
+          </Acc>
+          <Acc title="Headline Matrix (5 Pillars × 4 Audiences)" icon="📝" count={20}>
+            <div style={{ overflowX:"auto", paddingTop:12 }}><table style={{ width:"100%", borderCollapse:"separate", borderSpacing:"0 3px", fontSize:13 }}>
+              <thead><tr>{["Audience","Ease","Trust","Ownership","Control","Digital"].map(h=><th key={h} style={{ textAlign:"left", padding:"8px 12px", fontSize:12, textTransform:"uppercase", letterSpacing:"0.06em", color:GOLD, borderBottom:`2px solid ${BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif" }}>{h}</th>)}</tr></thead>
+              <tbody>{headlineMatrix.map((r,i)=><tr key={i} style={{ background:i%2===0?OFFWHITE:WHITE }}><td style={{ padding:"10px 12px", fontWeight:700, color:NAVY, borderRadius:"6px 0 0 6px", whiteSpace:"nowrap" }}>{r.aud}</td><td style={{ padding:"10px 12px", color:TEXT }}>{r.ease}</td><td style={{ padding:"10px 12px", color:TEXT }}>{r.trust}</td><td style={{ padding:"10px 12px", color:TEXT }}>{r.own}</td><td style={{ padding:"10px 12px", color:TEXT }}>{r.ctrl}</td><td style={{ padding:"10px 12px", color:TEXT, borderRadius:"0 6px 6px 0" }}>{r.dig}</td></tr>)}</tbody>
+            </table></div>
+            <div style={{ marginTop:10, padding:"10px 14px", background:RED_BG, borderRadius:8, border:`1px solid ${RED}22` }}><span style={{ fontSize:13, fontWeight:700, color:RED }}>⚠ COMPLIANCE: </span><span style={{ fontSize:14, color:TEXT2 }}>Do not translate headlines implying gold protects against losses or guarantees wealth preservation.</span></div>
+          </Acc>
+          <Acc title="EU Readiness Audit" sub="Each headline scored — 3 flagged critical for compliance" icon="🔍" badge="3 compliance flags" bc={RED} count={euAdapt.length}>
+            <div style={{ paddingTop:12 }}>{euAdapt.map((r,i)=>(
+              <div key={i} style={{ display:"flex", gap:12, padding:"12px 14px", background:i%2===0?OFFWHITE:WHITE, borderRadius:6, marginBottom:3, alignItems:"flex-start" }}>
+                <div style={{ minWidth:160 }}><div style={{ fontSize:15, fontWeight:600, color:NAVY, marginBottom:4 }}>{r.hl}</div><Bdg color={r.sev}>{r.sc}</Bdg></div>
+                <div style={{ flex:1 }}><div style={{ fontSize:14, color:r.sev==="critical"?RED:r.sev==="high"?GOLD:TEXT3, marginBottom:3 }}>{r.issue}</div><div style={{ fontSize:14, color:GREEN, fontWeight:500 }}>→ {r.fix}</div></div>
+              </div>
+            ))}</div>
+          </Acc>
+          <Acc title="Missing from the Brief" sub="Critical EU elements absent from proposed copy" icon="⚠️" badge={`${missingBrief.filter(m=>m.p==="CRITICAL").length} critical`} bc={RED} count={missingBrief.length}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:10, paddingTop:12 }}>
+              {missingBrief.map((m,i)=>(
+                <div key={i} style={{ padding:"14px 16px", background:OFFWHITE, borderRadius:8, border:`1px solid ${BORDER_L}` }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}><span style={{ fontSize:14, fontWeight:700, color:NAVY }}>{m.el}</span><Bdg color={m.p==="CRITICAL"?"critical":"high"}>{m.p}</Bdg></div>
+                  <p style={{ fontSize:14, color:TEXT2, lineHeight:1.5, margin:0 }}>{m.imp}</p>
+                </div>
+              ))}
+            </div>
+          </Acc>
+          <Acc title="Tone Calibration by Market" icon="🎨" count={4}>
+            <div style={{ paddingTop:12 }}>{toneMap.map((r,i)=>(
+              <div key={i} style={{ display:"flex", gap:14, padding:"12px 14px", background:i%2===0?OFFWHITE:WHITE, borderRadius:6, marginBottom:3, alignItems:"center", flexWrap:"wrap" }}>
+                <span style={{ fontSize:20, minWidth:30 }}>{r.mkt.slice(0,4)}</span>
+                <div style={{ flex:"0 0 150px" }}><div style={{ fontSize:12, color:TEXT3, fontFamily:"'Merriweather Sans',sans-serif" }}>Brief</div><div style={{ fontSize:14, color:TEXT3, textDecoration:"line-through" }}>{r.brief}</div></div>
+                <span style={{ color:GOLD, fontSize:16, fontWeight:700 }}>→</span>
+                <div style={{ flex:"0 0 170px" }}><div style={{ fontSize:12, color:GOLD, fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>EU-Adapted</div><div style={{ fontSize:15, fontWeight:700, color:NAVY }}>{r.eu}</div></div>
+                <div style={{ flex:1, fontSize:14, color:TEXT3, minWidth:160 }}>{r.why}</div>
+              </div>
+            ))}</div>
+          </Acc>
+          <Acc title="Ad Descriptions (90 char max)" icon="📋" count={descriptions90.length}>
+            <div style={{ paddingTop:12 }}>{descriptions90.map((d,i)=>(
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 14px", background:i%2===0?OFFWHITE:WHITE, borderRadius:5, marginBottom:2 }}>
+                <span style={{ padding:"2px 8px", borderRadius:4, fontSize:12, fontWeight:600, background:d.m==="ALL"?GREEN_BG:SKY_BG, color:d.m==="ALL"?GREEN:SKY, minWidth:32, textAlign:"center", fontFamily:"'Merriweather Sans',sans-serif" }}>{d.m}</span>
+                <span style={{ fontSize:14, color:TEXT }}>{d.t}</span>
+              </div>
+            ))}</div>
+          </Acc>
+          <Acc title="Landing Page Templates" sub="3 audiences × 4 markets = 12 Unbounce pages" icon="🖥️" count={3}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:12, paddingTop:12 }}>
+              {lpTemplates.map((lp,i)=>(
+                <div key={i} style={{ background:OFFWHITE, borderRadius:8, padding:16, border:`1px solid ${BORDER_L}`, borderTop:`4px solid ${lp.c}` }}>
+                  <div style={{ fontSize:17, fontWeight:700, color:NAVY, fontFamily:"'Playfair Display',serif", marginBottom:8 }}>{lp.name}</div>
+                  {lp.hls.map((h,hi)=><div key={hi} style={{ padding:"7px 10px", background:WHITE, borderRadius:5, marginBottom:3, fontSize:14, color:TEXT, borderLeft:`3px solid ${lp.c}` }}>"{h}"</div>)}
+                  <div style={{ marginTop:10, padding:"8px 10px", background:GOLD_BG, borderRadius:6, fontSize:14, color:GOLD, lineHeight:1.4 }}><b>EU:</b> {lp.note}</div>
+                </div>
+              ))}
+            </div>
+          </Acc>
+          <Acc title="Video Scripts (15s)" sub="Motion graphics: gold bar → phone. No voiceover. URGENT — no video assets exist." icon="🎬" badge="urgent" bc={RED} count={videoScripts.reduce((s,v)=>s+v.scripts.length,0)}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:10, paddingTop:12 }}>
+              {videoScripts.map((vs,vi)=>(
+                <div key={vi} style={{ background:OFFWHITE, borderRadius:8, padding:14, border:`1px solid ${BORDER_L}` }}>
+                  <div style={{ fontSize:15, fontWeight:700, color:GOLD, marginBottom:8, fontFamily:"'Playfair Display',serif" }}>{vs.pillar}</div>
+                  {vs.scripts.map((s,si)=>(
+                    <div key={si} style={{ padding:"10px 12px", background:WHITE, borderRadius:6, marginBottom:4, borderLeft:`3px solid ${GOLD}44` }}>
+                      <div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", marginBottom:2, fontFamily:"'Merriweather Sans',sans-serif" }}>Teaser</div>
+                      <div style={{ fontSize:15, fontWeight:700, color:NAVY, marginBottom:5 }}>{s.teas}</div>
+                      <div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", marginBottom:2, fontFamily:"'Merriweather Sans',sans-serif" }}>Body</div>
+                      <div style={{ fontSize:14, color:TEXT2, marginBottom:5 }}>{s.body}</div>
+                      <span style={{ padding:"3px 10px", borderRadius:4, background:GOLD_BG, fontSize:13, fontWeight:600, color:GOLD }}>{s.cta}</span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </Acc>
+        </div>}
+
+        {/* ═══ BUDGET ═══ */}
+        {aSec==="budget" && <div className="fu">
+          <ST>Budget Framework</ST>
+          <Sub>Monthly allocation by channel across three phases — shifting from content-heavy to paid-scale.</Sub>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))", gap:10, marginBottom:20 }}>
+            {[{l:"Phase 1",v:"$45K/mo",s:"Months 1–3"},{l:"Phase 2",v:"$56.5K/mo",s:"Months 3–6"},{l:"Phase 3",v:"$68K/mo",s:"Months 6–12"},{l:"12-Month Total",v:"$685,500",s:"All channels"}].map(b=><SC key={b.l} label={b.l} value={b.v} sub={b.s} accent={NAVY} />)}
+          </div>
+          <Acc title="Budget Breakdown by Channel" icon="💰" count={budgetData.length} open>
+            <div style={{ overflowX:"auto", paddingTop:12 }}><table style={{ width:"100%", borderCollapse:"separate", borderSpacing:"0 3px", fontSize:14 }}>
+              <thead><tr>{["Channel","Phase 1","Phase 2","Phase 3","12-Mo Total"].map((h,i)=><th key={h} style={{ textAlign:i===0?"left":"right", padding:"8px 12px", fontSize:12, textTransform:"uppercase", letterSpacing:"0.06em", color:TEXT3, borderBottom:`2px solid ${BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif" }}>{h}</th>)}</tr></thead>
+              <tbody>
+                {budgetData.map((b,i)=><tr key={i} style={{ background:i%2===0?OFFWHITE:WHITE }}><td style={{ padding:"10px 12px", borderRadius:"6px 0 0 6px" }}><div style={{ display:"flex", alignItems:"center", gap:8 }}><div style={{ width:8, height:8, borderRadius:3, background:b.c }} /><span style={{ fontWeight:500, color:NAVY }}>{b.cat}</span></div></td><td style={{ padding:"10px 12px", textAlign:"right", color:TEXT2 }}>${b.p1.toLocaleString()}</td><td style={{ padding:"10px 12px", textAlign:"right", color:TEXT2 }}>${b.p2.toLocaleString()}</td><td style={{ padding:"10px 12px", textAlign:"right", color:TEXT2 }}>${b.p3.toLocaleString()}</td><td style={{ padding:"10px 12px", textAlign:"right", fontWeight:700, color:NAVY, borderRadius:"0 6px 6px 0" }}>${(b.p1*3+b.p2*3+b.p3*6).toLocaleString()}</td></tr>)}
+                <tr style={{ borderTop:`2px solid ${GOLD}33` }}><td style={{ padding:"12px 12px", fontWeight:700, color:GOLD }}>TOTAL / MONTH</td><td style={{ padding:"12px", textAlign:"right", fontWeight:700, color:GOLD }}>${budgetData.reduce((s,b)=>s+b.p1,0).toLocaleString()}</td><td style={{ padding:"12px", textAlign:"right", fontWeight:700, color:GOLD }}>${budgetData.reduce((s,b)=>s+b.p2,0).toLocaleString()}</td><td style={{ padding:"12px", textAlign:"right", fontWeight:700, color:GOLD }}>${budgetData.reduce((s,b)=>s+b.p3,0).toLocaleString()}</td><td style={{ padding:"12px", textAlign:"right", fontWeight:700, color:GOLD, fontSize:16 }}>$685,500</td></tr>
+              </tbody>
+            </table></div>
+          </Acc>
+          <Acc title="Phase Visual Breakdown" sub="Channel allocation bars showing spend shift" icon="📊">
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, paddingTop:12 }}>
+              {[{l:"Phase 1 (M1–3)",k:"p1",t:45000},{l:"Phase 2 (M3–6)",k:"p2",t:56500},{l:"Phase 3 (M6–12)",k:"p3",t:68000}].map(p=>(
+                <div key={p.k} style={{ background:OFFWHITE, borderRadius:8, padding:16, border:`1px solid ${BORDER_L}` }}>
+                  <div style={{ fontSize:14, fontWeight:600, color:NAVY }}>{p.l}</div>
+                  <div style={{ fontSize:24, fontWeight:700, color:GOLD, fontFamily:"'Playfair Display',serif", marginBottom:14 }}>${p.t.toLocaleString()}/mo</div>
+                  {budgetData.map((b,i)=><div key={i} style={{ marginBottom:8 }}><div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:TEXT3, marginBottom:2, fontFamily:"'Merriweather Sans',sans-serif" }}><span>{b.cat}</span><span>${b[p.k].toLocaleString()}</span></div><PBar value={b[p.k]} max={20000} color={b.c} /></div>)}
+                </div>
+              ))}
+            </div>
+          </Acc>
+        </div>}
+
+        {/* ═══ KPIs ═══ */}
+        {aSec==="kpis" && <div className="fu">
+          <ST>KPI Targets & Measurement</ST>
+          <Sub>Recalibrated after funnel audit — added Checkout Rate and Placed→Paid Rate as new mid-funnel KPIs. First Purchase targets adjusted for real cancellation data.</Sub>
+          <Acc title="KPI Progression Table" icon="📈" count={kpis.length} open>
+            <div style={{ overflowX:"auto", paddingTop:12 }}><table style={{ width:"100%", borderCollapse:"separate", borderSpacing:"0 3px", fontSize:14 }}>
+              <thead><tr>{["Metric","Current","Day 30","Day 60","Day 90","Month 6","Month 12"].map((h,i)=><th key={h} style={{ textAlign:i===0?"left":"center", padding:"8px 12px", fontSize:12, textTransform:"uppercase", letterSpacing:"0.06em", color:TEXT3, borderBottom:`2px solid ${BORDER_L}`, fontWeight:700, fontFamily:"'Merriweather Sans',sans-serif" }}>{h}</th>)}</tr></thead>
+              <tbody>{kpis.map((k,i)=><tr key={i} style={{ background:i%2===0?OFFWHITE:WHITE }}><td style={{ padding:"10px 12px", fontWeight:600, color:NAVY, borderRadius:"6px 0 0 6px", whiteSpace:"nowrap" }}>{k.label} {k.isNew && <Bdg color="new">New</Bdg>}</td><td style={{ padding:"10px 12px", textAlign:"center", color:RED, fontWeight:500 }}>{k.current}</td><td style={{ padding:"10px 12px", textAlign:"center", color:TEXT2 }}>{k.d30}</td><td style={{ padding:"10px 12px", textAlign:"center", color:TEXT2 }}>{k.d60}</td><td style={{ padding:"10px 12px", textAlign:"center", color:SKY, fontWeight:500 }}>{k.d90}</td><td style={{ padding:"10px 12px", textAlign:"center", color:GOLD, fontWeight:500 }}>{k.m6}</td><td style={{ padding:"10px 12px", textAlign:"center", fontWeight:700, color:GREEN, borderRadius:"0 6px 6px 0" }}>{k.m12}</td></tr>)}</tbody>
+            </table></div>
+          </Acc>
+          <Acc title="Month 10–12 Milestone" sub="Surpass FlexGold → #4 EU platform" icon="🏆">
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", paddingTop:12 }}>
+              <span style={{ fontSize:32 }}>🏆</span>
+              <div><div style={{ fontSize:20, fontWeight:700, color:GOLD, fontFamily:"'Playfair Display',serif", marginBottom:6 }}>Surpass FlexGold's 11,400 Monthly EU Visits</div><p style={{ fontSize:15, color:TEXT2, lineHeight:1.6, margin:0 }}>Become #4 European digital precious metals platform — behind BullionVault (302K), VeraCash (105K), and Kinesis (7.8K). Achievable because FlexGold is DACH-only while OneGold addresses four markets simultaneously.</p></div>
+            </div>
+          </Acc>
+          <Acc title="Critical Dependencies" sub="Missing one blocks downstream — load-bearing walls" icon="🔗" count={6}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))", gap:10, paddingTop:12 }}>
+              {[{dep:"Credit Card Payments",blocks:"All EU conversion targets",impact:"Wire-only kills sub-€1K AOV conversion",isNew:true},
+                {dep:"App UX Fixes (popup, email, compliance)",blocks:"Checkout rate, placed→paid rate",impact:"1-2% EU conversion persists",isNew:true},
+                {dep:"Attribution / Deep Linking",blocks:"All campaign optimization and KPI tracking",impact:"Cannot attribute installs to campaigns",isNew:true},
+                {dep:"Price Chart Pages",blocks:"Email lead gen, organic, retargeting",impact:"Entire organic engine stalls"},
+                {dep:"Hreflang Tags",blocks:"All EU domain rankings",impact:"Domains cannibalize each other"},
+                {dep:"Revolut Comparison Pages",blocks:"Meta campaigns, social wedge",impact:"No landing page for largest audience"},
+              ].map((d,i)=>(
+                <div key={i} style={{ padding:"14px 16px", background:OFFWHITE, borderRadius:8, border:`1px solid ${d.isNew?ORANGE+"44":BORDER_L}`, position:"relative" }}>
+                  {d.isNew && <span style={{ position:"absolute", top:8, right:8, fontSize:9, fontWeight:700, color:ORANGE, background:ORANGE_BG, padding:"1px 6px", borderRadius:3, fontFamily:"'Merriweather Sans',sans-serif", textTransform:"uppercase" }}>New</span>}
+                  <div style={{ fontSize:16, fontWeight:700, color:NAVY, marginBottom:6, fontFamily:"'Playfair Display',serif" }}>{d.dep}</div>
+                  <div style={{ fontSize:12, color:TEXT3, textTransform:"uppercase", fontWeight:600, fontFamily:"'Merriweather Sans',sans-serif" }}>Blocks</div>
+                  <div style={{ fontSize:14, color:TEXT2, marginBottom:6, lineHeight:1.4 }}>{d.blocks}</div>
+                  <div style={{ fontSize:12, color:RED, fontWeight:700, textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>If delayed</div>
+                  <div style={{ fontSize:14, color:RED, lineHeight:1.4 }}>{d.impact}</div>
+                </div>
+              ))}
+            </div>
+          </Acc>
+        </div>}
+
+        {/* FOOTER */}
+        <div style={{ textAlign:"center", padding:"32px 0 16px", borderTop:`1px solid ${BORDER_L}`, marginTop:32 }}>
+          <div style={{ fontSize:12, color:TEXT3, letterSpacing:"0.08em", textTransform:"uppercase", fontFamily:"'Merriweather Sans',sans-serif" }}>OneGold EU Digital Media Strategy · March 2026 · v2 Post-Funnel Audit</div>
+          <div style={{ fontSize:12, color:BORDER, marginTop:4, fontFamily:"'Merriweather Sans',sans-serif" }}>Synthesized from 9 strategy documents + CMO funnel audit email (March 25, 2026)</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+  </script>
+</body>
+</html>
